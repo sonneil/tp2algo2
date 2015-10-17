@@ -34,13 +34,14 @@ $k$ : la cola de paquetes más larga de todas las computadoras.
 \serc{sistema}{
 	\\
 	\donde{sistema}{\tupla{
-			Compus : \mbox{arreglo(\tupla{IP: String , pN: puntero(conjLog(paquete)),pN': puntero(conjLog(paquetePos)), \#PaquetesEnviados: nat})}, %esto quedo feo
-			CompusPorPref : \mbox{diccPref(compu,\tupla{PorNom: conjLog(paquete), PorPrior: conjLog(paquete),PorNom': conjLog(paquetePos), PorPrior': conjLog(paquetePos)}},
-      CaminosMinimos: \mbox{arreglo(arreglo(arreglo(compu)))},
-      LaQMasEnvio : \mbox{nat
-	},
-	Red: \mbox{red}	
-	}}
+      Compus : \mbox{arreglo(arreglo(\tupla{hayHippie: bool, hayEst: bool, hayAgente: bool}, \tupla{pl:nat, nombre:string}))},
+      estudiantes: \mbox{DiccTrie(nombre:string, pos:pos)},
+      hippies: \mbox{DiccTrie(nombre:string, pos:pos)},
+      agentes: \mbox{DiccHash(pl:nat,\tupla{pos:pos,cantSanc:nat,cantCapturas:nat})},
+      masVigilante: \mbox{placa:nat},
+      conKSanciones: \mbox{\tupla{ocurrioSancion:bool, porKSanc: arreglo(placa)}}
+    }
+	}
 }
 
 \subsubsection*{Invariante de representación}
