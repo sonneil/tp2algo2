@@ -47,7 +47,7 @@ $\textbf{usa}$
  {$id \in (estudiantes(cs) \cup hippies(cs))$}
  {$\var{res} \igobs posEstudianteYHippie(id, cs)$}
  {Devuelve la posicion del estudiante o hippie ingresado.}
- {O($1$)}
+ {O($|n_m|$)}
  {}
 
 \operacion{PosicionAgente}{in a: agente, in cs: campusSeguro }{res : posicion}
@@ -84,28 +84,28 @@ $\textbf{usa}$
 {$\var(cs) \equiv \var(cs_0) \land e \notin (estudiantes(cs) \cup hippies(cs)) esIngreso?(p, campus(cs)) \land $\\$\neg estaOcupada?(p, cs))$}
 {$\var{res} \igobs ingresarEstudiante(e, p, cs_0)$}
 {Ingresa un nuevo estudiante al campus por una de las entradas.}
-{O($1$)}
+{O($|n_m|$)}
 {}
 
 \operacion{ingresarHippie}{in h: nombre, in p: posicion, in/out cs: campusSeguro }{}
 {$\var(cs) \equiv \var(cs_0) \land h \notin (estudiantes(cs) \cup hippies(cs)) esIngreso?(p, campus(cs)) \land $\\$\neg estaOcupada?(p, cs))$}
 {$\var{res} \igobs ingresarHippie(e, p, cs_0)$}
 {Ingresa un nuevo hippie al campus por una de las entradas.}
-{O($1$)}
+{O($|n_m|$)}
 {}
 
 \operacion{moverEstudiante}{in e: nombre, in d: direccion, in/out cs: campusSeguro }{}
 {$\var(cs) \equiv \var(cs_0) \land e \in estudiantes(cs) \land (seRetira(e, d, cs) \lor $\\$ (posValida?(proxPosicion(posEstudianteYHippie(e, cs), d, campus(cs)), campus(cs)) \land $\\$ \neg estaOcupada?(proxPosicion(posEstudianteYHippie(e, cs), d, campus(cs)), cs)))$}
 {$\var{res} \igobs moverEstudiante(e, d, cs_0)$}
 {Mueve un estudiante en la direccion indicada.}
-{O($1$)}
+{O($|n_m|$)}
 {}
 
 \operacion{moverHippie}{in h: nombre, in/out cs: campusSeguro }{}
 {$\var(cs) \equiv \var(cs_0) \land h \in hippies(cs) \land $\\$ \neg todasOcupadas?(vecinos(posEstudianteYHippie(h, cs), campus(cs)), cs)$}
 {$\var{res} \igobs moverHippie(h, cs_0)$}
 {Mueve un hippie hacia el estudiante más cercano.}
-{O($1$)}
+{O($|n_m| + N_e$)}
 {}
 
 
@@ -113,7 +113,7 @@ $\textbf{usa}$
 {$\var(cs) \equiv \var(cs_0) \land a \in agentes(cs) \yluego cantSanciones(a, cs) \leq 3 \land $\\$ \neg todasOcupadas?(vecinos(posAgente(a, cs), campus(cs)), cs)$}
 {$\var{res} \igobs moverAgente(a, cs_0)$}
 {Mueve un agente hacia el hippie más cercano.}
-{O($1$)}
+{O($|n_m| + log N_a + N_h$)}
 {}
 
 \operacion{CantidadHippies}{in cs: campusSeguro }{res : nat}
@@ -136,13 +136,16 @@ $\textbf{usa}$
  {Devuelve al agente con más capturas realizadas del campus.}
  {O($1$)}
  {}
- 
-Las complejidades están en función de las siguientes variables:\\
-$n$ : la cantidad total de computadoras que hay en el sistema, \\
-$L$ : el hostname más largo de todas las computadoras, \\
-$k$ : la cola de paquetes más larga de todas las computadoras. 
-\\ \\
 
+Las complejidades están en función de las siguientes variables:\\
+$c$ : es una instancia del campusSeguro, \\
+$p$ : es una posición, \\
+$n$ : es el nombre de un estudiante/hippie y $|n_m|$ es la longitud más larga entre todos los nombres del campusSeguro, \\
+$d$ : es una dirección, \\
+$N_a$ : es la cantidad de agentes, \\
+$N_e$ : es la cantidad actual de estudiantes, \\
+$N_h$ : es la cantidad actual de hippies. \\
+\\ \\
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
