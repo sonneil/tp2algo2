@@ -1,24 +1,141 @@
 %\\\\\\\\\\\\!TEX root = tp2.tex
 
-\section{DCNet}
+\section{CampusSeguro}
 
 \subsection{Interfaz}
 
-\sexc{AS}
+\sexc{CampusSeguro}
 $\textbf{usa}$  
-\generos{as}
+\generos{CampusSeguro}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsubsection*{Operaciones}
 
 
-\operacion{crearSistema}{in r: red}{res : dcnet}
+%%%%%% observadores basicos %%%%%%
+
+\operacion{campus}{in cs: campusSeguro }{res : campus}
  {true}
- {$\var{res} \igobs iniciarDCNet(r)$}
- {Crea un sistema DCNet.}
- {O($L \times n^5$)}
- {res.red es un puntero a la red que recibimos por parámetro}
+ {$\var{res} \igobs campus(cs)$}
+ {Devuelve el campus del campusSeguro ingresado.}
+ {O($1$)}
+ {}
+ 
+\operacion{estudiantes}{in cs: campusSeguro }{res : conj(nombre)}
+ {true}
+ {$\var{res} \igobs estudiantes(cs)$}
+ {Devuelve un conjunto con los estudiantes del campusSeguro ingresado.}
+ {O($1$)}
+ {}
+ 
+\operacion{hippies}{in cs: campusSeguro }{res : conj(nombre)}
+ {true}
+ {$\var{res} \igobs hippies(cs)$}
+ {Devuelve un conjunto con los hippies del campusSeguro ingresado.}
+ {O($1$)}
+ {}
+
+\operacion{agentes}{in cs: campusSeguro }{res : conj(agentes)}
+ {true}
+ {$\var{res} \igobs agentes(cs)$}
+ {Devuelve un conjunto con los agentes del campusSeguro ingresado.}
+ {O($1$)}
+ {}
+ 
+\operacion{PosicionEstudiantesYHippies}{in id: nombre, in cs: campusSeguro }{res : posicion}
+ {$id \in (estudiantes(cs) \cup hippies(cs))$}
+ {$\var{res} \igobs posEstudianteYHippie(id, cs)$}
+ {Devuelve la posicion del estudiante o hippie ingresado.}
+ {O($1$)}
+ {}
+
+\operacion{PosicionAgente}{in a: agente, in cs: campusSeguro }{res : posicion}
+ {$a \in agentes(cs)$}
+ {$\var{res} \igobs posAgente(a, cs)$}
+ {Devuelve la posicion del agente ingresado.}
+ {O($1$)}
+ {}
+ 
+\operacion{CantidadSanciones}{in a: agente, in cs: campusSeguro }{res : nat}
+ {$a \in agentes(cs)$}
+ {$\var{res} \igobs cantSanciones(a, cs)$}
+ {Devuelve la cantidad de sanciones del agente ingresado.}
+ {O($1$)}
+ {}
+ 
+\operacion{CantidadHippiesAtrapados}{in a: agente, in cs: campusSeguro }{res : nat}
+ {$a \in agentes(cs)$}
+ {$\var{res} \igobs cantHippiesAtrapados(a, cs)$}
+ {Devuelve la cantidad de hippies atrapados por el agente ingresado.}
+ {O($1$)}
+ {}
+ 
+ %%%%%% generadores %%%%%%%
+
+\operacion{comenzarRastrillaje}{in c: campus, in d: dicc(agente posicion) }{res : campusSeguro}
+{$(\paratodo{agente}{a})(def?(a, d) \impluego (posValida?(obtener(a, d)) \land \neg ocupada?(obtener(a, d), c))) \land $\\$ (\paratodo{agente}{a, a2}) ((def?(a, d) \land def?(a2, d) \land a \neq a2) \impluego obtener(a, d) \neq obtener(a2, d)$}
+{$\var{res} \igobs comenzarRastrillaje(c, d)$}
+{Crea un nuevo campusSeguro con campus y los agentes ingresados.}
+{O($1$)}
+{}
+ 
+\operacion{ingresarEstudiante}{in e: nombre, in p: posicion, in/out cs: campusSeguro }{}
+{$\var(cs) \equiv \var(cs_0) \land e \notin (estudiantes(cs) \cup hippies(cs)) esIngreso?(p, campus(cs)) \land $\\$\neg estaOcupada?(p, cs))$}
+{$\var{res} \igobs ingresarEstudiante(e, p, cs_0)$}
+{Ingresa un nuevo estudiante al campus por una de las entradas.}
+{O($1$)}
+{}
+
+\operacion{ingresarHippie}{in h: nombre, in p: posicion, in/out cs: campusSeguro }{}
+{$\var(cs) \equiv \var(cs_0) \land h \notin (estudiantes(cs) \cup hippies(cs)) esIngreso?(p, campus(cs)) \land $\\$\neg estaOcupada?(p, cs))$}
+{$\var{res} \igobs ingresarHippie(e, p, cs_0)$}
+{Ingresa un nuevo hippie al campus por una de las entradas.}
+{O($1$)}
+{}
+
+\operacion{moverEstudiante}{in e: nombre, in d: direccion, in/out cs: campusSeguro }{}
+{$\var(cs) \equiv \var(cs_0) \land e \in estudiantes(cs) \land (seRetira(e, d, cs) \lor $\\$ (posValida?(proxPosicion(posEstudianteYHippie(e, cs), d, campus(cs)), campus(cs)) \land $\\$ \neg estaOcupada?(proxPosicion(posEstudianteYHippie(e, cs), d, campus(cs)), cs)))$}
+{$\var{res} \igobs moverEstudiante(e, d, cs_0)$}
+{Mueve un estudiante en la direccion indicada.}
+{O($1$)}
+{}
+
+\operacion{moverHippie}{in h: nombre, in/out cs: campusSeguro }{}
+{$\var(cs) \equiv \var(cs_0) \land h \in hippies(cs) \land $\\$ \neg todasOcupadas?(vecinos(posEstudianteYHippie(h, cs), campus(cs)), cs)$}
+{$\var{res} \igobs moverHippie(h, cs_0)$}
+{Mueve un hippie hacia el estudiante más cercano.}
+{O($1$)}
+{}
+
+
+\operacion{moverAgente}{in a: nombre, in/out cs: campusSeguro }{}
+{$\var(cs) \equiv \var(cs_0) \land a \in agentes(cs) \yluego cantSanciones(a, cs) \leq 3 \land $\\$ \neg todasOcupadas?(vecinos(posAgente(a, cs), campus(cs)), cs)$}
+{$\var{res} \igobs moverAgente(a, cs_0)$}
+{Mueve un agente hacia el hippie más cercano.}
+{O($1$)}
+{}
+
+\operacion{CantidadHippies}{in cs: campusSeguro }{res : nat}
+ {true}
+ {$\var{res} \igobs cantHippies(cs)$}
+ {Devuelve la cantidad de hippies en el campus.}
+ {O($1$)}
+ {}
+ 
+\operacion{CantidadEstudiantes}{in cs: campusSeguro }{res : nat}
+ {true}
+ {$\var{res} \igobs cantEstudiantes(cs)$}
+ {Devuelve la cantidad de estudiantes en el campus.}
+ {O($1$)}
+ {}
+ 
+ \operacion{MásVigilante}{in cs: campusSeguro }{res : agente}
+ {true}
+ {$\var{res} \igobs masVigilante(cs)$}
+ {Devuelve al agente con más capturas realizadas del campus.}
+ {O($1$)}
+ {}
  
 Las complejidades están en función de las siguientes variables:\\
 $n$ : la cantidad total de computadoras que hay en el sistema, \\
