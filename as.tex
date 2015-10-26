@@ -1,5 +1,7 @@
 %\\\\\\\\\\\\!TEX root = tp2.tex
 
+
+
 \section{CampusSeguro}
 
 \subsection{Interfaz}
@@ -43,28 +45,28 @@ $\textbf{usa}$
  {O($1$)}
  {}
  
-\operacion{PosicionEstudiantesYHippies}{in id: nombre, in cs: campusSeguro }{res : posicion}
+\operacion{PosicionEstudiantesYHippies}{in id: nombre, cs: campusSeguro }{res : posicion}
  {$id \in (estudiantes(cs) \cup hippies(cs))$}
  {$\var{res} \igobs posEstudianteYHippie(id, cs)$}
  {Devuelve la posicion del estudiante o hippie ingresado.}
  {O($|n_m|$)}
  {}
 
-\operacion{PosicionAgente}{in a: agente, in cs: campusSeguro }{res : posicion}
+\operacion{PosicionAgente}{in a: agente, cs: campusSeguro }{res : posicion}
  {$a \in agentes(cs)$}
  {$\var{res} \igobs posAgente(a, cs)$}
  {Devuelve la posicion del agente ingresado.}
  {O($1$)}
  {}
  
-\operacion{CantidadSanciones}{in a: agente, in cs: campusSeguro }{res : nat}
+\operacion{CantidadSanciones}{in a: agente, cs: campusSeguro }{res : nat}
  {$a \in agentes(cs)$}
  {$\var{res} \igobs cantSanciones(a, cs)$}
  {Devuelve la cantidad de sanciones del agente ingresado.}
  {O($1$)}
  {}
  
-\operacion{CantidadHippiesAtrapados}{in a: agente, in cs: campusSeguro }{res : nat}
+\operacion{CantidadHippiesAtrapados}{in a: agente, cs: campusSeguro }{res : nat}
  {$a \in agentes(cs)$}
  {$\var{res} \igobs cantHippiesAtrapados(a, cs)$}
  {Devuelve la cantidad de hippies atrapados por el agente ingresado.}
@@ -73,28 +75,28 @@ $\textbf{usa}$
  
  %%%%%% generadores %%%%%%%
 
-\operacion{comenzarRastrillaje}{in c: campus, in d: dicc(agente posicion) }{res : campusSeguro}
+\operacion{comenzarRastrillaje}{in c: campus, d: dicc(agente posicion) }{res : campusSeguro}
 {$(\paratodo{agente}{a})(def?(a, d) \impluego (posValida?(obtener(a, d)) \land \neg ocupada?(obtener(a, d), c))) \land $\\$ (\paratodo{agente}{a, a2}) ((def?(a, d) \land def?(a2, d) \land a \neq a2) \impluego obtener(a, d) \neq obtener(a2, d)$}
 {$\var{res} \igobs comenzarRastrillaje(c, d)$}
 {Crea un nuevo campusSeguro con campus y los agentes ingresados.}
 {O($1$)}
 {}
  
-\operacion{ingresarEstudiante}{in e: nombre, in p: posicion, in/out cs: campusSeguro }{}
+\operacion{ingresarEstudiante}{in e: nombre, p: posicion, in/out cs: campusSeguro }{}
 {$\var(cs) \equiv \var(cs_0) \land e \notin (estudiantes(cs) \cup hippies(cs)) esIngreso?(p, campus(cs)) \land $\\$\neg estaOcupada?(p, cs))$}
 {$\var{res} \igobs ingresarEstudiante(e, p, cs_0)$}
 {Ingresa un nuevo estudiante al campus por una de las entradas.}
 {O($|n_m|$)}
 {}
 
-\operacion{ingresarHippie}{in h: nombre, in p: posicion, in/out cs: campusSeguro }{}
+\operacion{ingresarHippie}{in h: nombre, p: posicion, in/out cs: campusSeguro }{}
 {$\var(cs) \equiv \var(cs_0) \land h \notin (estudiantes(cs) \cup hippies(cs)) esIngreso?(p, campus(cs)) \land $\\$\neg estaOcupada?(p, cs))$}
 {$\var{res} \igobs ingresarHippie(e, p, cs_0)$}
 {Ingresa un nuevo hippie al campus por una de las entradas.}
 {O($|n_m|$)}
 {}
 
-\operacion{moverEstudiante}{in e: nombre, in d: direccion, in/out cs: campusSeguro }{}
+\operacion{moverEstudiante}{in e: nombre, d: direccion, in/out cs: campusSeguro }{}
 {$\var(cs) \equiv \var(cs_0) \land e \in estudiantes(cs) \land (seRetira(e, d, cs) \lor $\\$ (posValida?(proxPosicion(posEstudianteYHippie(e, cs), d, campus(cs)), campus(cs)) \land $\\$ \neg estaOcupada?(proxPosicion(posEstudianteYHippie(e, cs), d, campus(cs)), cs)))$}
 {$\var{res} \igobs moverEstudiante(e, d, cs_0)$}
 {Mueve un estudiante en la direccion indicada.}
