@@ -1,0 +1,298 @@
+%\\\\\\\\\\\\!TEX root = tp2.tex
+
+\section{Diccionario por nombres}
+
+\subsection{Interfaz}
+
+\sexc{Dicc}
+$\textbf{usa}$  
+\generos{dpn}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection*{Operaciones}
+
+
+\operacion{Vacio}{}{res : dpn}
+ {true}
+ {$dpn \igobs vacia()$}
+ {Crea un nuevo diccionario}
+ {}
+ {$O(1)$}
+ 
+ \operacion{Definido?}{in/out d:dpn, in c:String}{res:bool}
+  {$true$}
+  {$res \igobs def?(d_0,e)$}
+  {Indica si la clave tiene un significado}
+  {}
+  {$O(long(c))$}
+
+ \operacion{Definir}{in/out d:dpn, in c:String, in e:\alpha}{}
+  {$d=d_0$}
+  {$d \igobs Definir(d_0,e)$}
+  {Se define e en el diccionario}
+  {No hay aliasing, se inserta por copia}
+  {$O(long(c))$}
+
+ \operacion{Eliminar}{in/out d:dpn, in c:String}{}
+ {$d \igobs d_0 \land definido?(d,c)$}
+ {$d \igobs eliminar(d_0,c)$}
+ {}
+ {$O(long(c))$}
+ {No hay aliasing}
+
+ \operacion{Significado}{in/out d:dpn, in c:String}{res:\alpha}
+ {$def?(d,c)$}
+ {$res \igobs significado(d,c)$}
+ {Se retornan los significados}
+ {$O(long(c))$}
+ {Hay aliasing entre el objeto devuelto y el almacenado}
+
+ \operacion{ALista}{in/out d:dpn, in c:String}{res:\alpha}
+ {$true$}
+ {$ALista(res) \igobs tuplasClaveDiccionario(d)$}
+ {Retorna tuplas <clave,significado> del diccionario}
+ {$O(1)$}
+ {Retorna por referencia, hay aliasing}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Representación}
+
+\serc{estr}{
+	\\
+	\donde{estr}{\tupla{ buckets: Vector(puntero(nodo)), enLista: Lista(<clave:String, significado:\alpha>) }}
+  \donde{Nodo}{\tupla{ hayS: bool, s:\alpha, enLista: itLista(<clave:String,significado:\alpha>), hijos: estr}}
+}
+
+\subsubsection*{Invariante de representación}
+
+\rep{estr}{e} 
+\begin{enumerate}
+\item El tamaño de buckets de estr es 256
+\item El conjunto de claves de estr es igual al conjunto formado por cada prefijo obtenido al ir desde la raiz hasta un nodo con hayS=true
+\end{enumerate}
+
+\abs{estr}{dicc}{e}{d}
+$(\paratodo{String}{s}) s \in e.claves \igobs def?(d,s)$ $\land$ \\
+$((\paratodo{String}{s}) Definido?(d,s)) \impluego Definido?(e,s) \yluego (obtener(d,s) \igobs Significado(e,s))$
+
+\subsubsection*{Auxiliares}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Algoritmos}
+
+\algoritmo{Vacio}{}{res:dpn}{
+  \State $res \larr CrearTupla(InicializarVector(),NULL)$
+}{O(1)}
+
+\algoritmo{iDefinir}{in/out d:dpn, in clave:String, in e:\alpha}{res:dpn}{
+  \State $nodoClave:puntero(nodoClave) \larr nuevoNodoClave(clave, d.claves, NULL)$ \complejidad{O(long(clave))}
+  \State $nodo:puntero(Nodo) \larr NULL$
+  \State $i:nat \larr 0$
+  \State // Por ref
+  \State $caracteres \larr d.buckets$ \complejidad {O(1)}
+  \If {$caracteres.esVacia()$} \complejidad{O(1)}
+    \State $caracteres = CrearHijos()$ \complejidad{O(1)}
+    \State $d.bucket \larr caracteres$ \complejidad{O(1)}
+  \EndIf
+
+  \While {$i \le Longitud(clave)$} \complejidad {O(long(clave))}
+    \State $nodo \larr caracteres[ord(clave[i])]$ \complejidad {O(1)}
+    \State // Por ref
+    \State $caracteres \larr nodo.hijos$ \complejidad {O(1)}
+    \If {$caracteres.esVacia()$} \complejidad{O(1)}
+      \State $caracteres = CrearHijos()$ \complejidad{O(1)}
+      \State $nodo.hijos \larr caracteres$ \complejidad{O(1)}
+    \EndIf
+    \State $i++$ \complejidad {O(1)}
+  \EndWhile
+  \State $nodo.hayS \larr True$ \complejidad {O(1)}
+  \State $nodo.significado \larr e$ \complejidad {O(1)}
+  \State // Almaceno el iterador de lista al agregar atras la clave a la lista de claves del trie, por interfaz de listaEnlazada
+  \State $nodo.enLista \larr d.claves.agAtras(<clave,e>)$ \complejidad {O(long(clave))}
+}{O(long(clave))}
+
+\algoritmo{iEliminar}{in/out d:dpn, in clave:String}{res:dpn}{
+  \State $nodo:puntero(Nodo) \larr NULL$
+  \State $i:nat \larr 0$
+  \State // Por ref
+  \State $caracteres \larr d.buckets$ \complejidad {O(1)}
+
+  \While {$i \le Longitud(clave)$} \complejidad {O(long(clave))}
+    \State $nodo \larr caracteres[ord(clave[i])]$ \complejidad {O(1)}
+    \State // Por ref
+    \State $caracteres \larr nodo.hijos$ \complejidad {O(1)}
+    \State $i++$ \complejidad {O(1)}
+  \EndWhile
+  \State $nodo.hayS \larr False$ \complejidad {O(1)}
+  \State $nodo.enLista.eliminarSiguiente()$ \complejidad {O(1)}
+  \If {$nodo.hijos = NULL$}
+    \State // Elimina un puntero
+    \State $borrar(nodo)$ \complejidad{O(1)} 
+  \EndIf
+}{O(long(clave))}
+
+
+\algoritmo{iSignificado}{in/out d:dpn, in clave:String}{res:\alpha}{
+  \State $nodo:puntero(Nodo) \larr NULL$ \complejidad{O(1)}
+  \State $buckets:puntero(Nodo) \larr d.buckets$ \complejidad{O(1)}
+  \State $i \larr 0$ \complejidad{O(1)}
+  \While {$i \le Longitud(clave)$}
+    \State $nodo \larr buckets[ord(clave[i])]$ \complejidad{O(1)}
+    \State $i++$
+  \EndWhile
+  \State // Por ref
+  \State $res \larr nodo.significado$ \complejidad{O(1)}
+}{O(long(clave))}
+
+\algoritmo{iClaves}{in/out d:dpn}{res:Lista(String)}{
+  \State $res \larr d.claves$ \complejidad{O(1)}
+}{O(1)}
+
+\algoritmo{iDefinido?}{in/out d:dpn, in clave:String}{res:bool}{
+  \State $nodo:puntero(Nodo) \larr NULL$ \complejidad{O(1)}
+  \State $buckets:puntero(Nodo) \larr d.buckets$ \complejidad{O(1)}
+  \State $i \larr 0$ \complejidad{O(1)}
+  \While {$i \le Longitud(clave)$} \complejidad {O(long(clave))}
+    \State $nodo \larr buckets[ord(clave[i])]$ \complejidad{O(1)}
+    \If {$nodo = NULL$} \complejidad{O(1)}
+      \State $return$ $False$  \complejidad{O(1)}
+    \EndIf 
+    \State $i++$ \complejidad{O(1)}
+  \EndWhile
+  \State $res \larr nodo.hayS$ \complejidad{O(1)}
+}{O(long(clave))}
+
+\subsection{Operaciones del iterador}
+ \operacion{CrearIterador}{in d:dpn}{res:itDPN}
+ {$true$}
+ {$tuplasClaveSignificado(d) \igobs siguientes(res) \yluego aliasing(tuplasClaveSignificado(d),siguientes(res)) \land esVacia(anteriores(res))$}
+ {Crea un iterador del diccionario por nombres}
+ {$O(1)$}
+ {Existe aliasing entre todas las tuplas <Clave, Significado> del dicc y siguientes del iterador}
+
+  \operacion{HaySiguiente}{in it:itDPN}{res:bool}
+ {$true$}
+ {$res \igobs haySiguiente(it)$}
+ {Indica si hay siguiente}
+ {$O(1)$}
+ {}
+
+ \operacion{HayAnterior}{in it:itDPN}{res:bool}
+ {$true$}
+ {$res \igobs hayAnterior(it)$}
+ {Indica si hay anterior}
+ {$O(1)$}
+ {}
+
+ \operacion{Siguiente}{in it:itDPN}{res:<clave:String,significado:\alpha>}
+ {$HaySiguiente(it)$}
+ {$res \igobs siguiente(it)$}
+ {Retorna el siguiente}
+ {$O(1)$}
+ {Hay aliasing}
+
+\operacion{Anterior}{in it:itDPN}{res:<clave:String,significado:\alpha>}
+ {$HayAnterior(it)$}
+ {$res \igobs anterior(it)$}
+ {Retorna el anterior}
+ {$O(1)$}
+ {Hay aliasing}
+
+ \operacion{SiguienteClave}{in it:itDPN}{res:String}
+ {$HaySiguiente(it)$}
+ {$res \igobs siguiente(it).significado$}
+ {Retorna la siguiente clave}
+ {$O(1)$}
+ {Hay aliasing}
+
+ \operacion{AnteriorClave}{in it:itDPN}{res:String}
+ {$HayAnterior(it)$}
+ {$res \igobs anterior(it).significado$}
+ {Retorna la clave anterior}
+ {$O(1)$}
+ {Hay aliasing}
+
+ \operacion{SiguienteSignificado}{in it:itDPN}{res:\alpha}
+ {$HaySiguiente(it)$}
+ {$res \igobs siguiente(it).significado$}
+ {Retorna el siguiente significado}
+ {$O(1)$}
+ {Hay aliasing}
+
+ \operacion{AnteriorSignificado}{in it:itDPN}{res:\alpha}
+ {$HayAnterior(it)$}
+ {$res \igobs anterior(it).significado$}
+ {Retorna el significado anterior}
+ {$O(1)$}
+ {Hay aliasing}
+
+ \operacion{Avanzar}{in/out it:itDPN}{}
+ {$HaySiguiente(it) \land it \igobs it_0$}
+ {$anteriores(it_0) \bullet primero(siguientes(it_0)) \igobs anteriores(it) \land fin(siguientes(it_0)) \igobs siguientes(it)$}
+ {Modifica el iterador, haciendolo avanzar una posicion}
+ {$O(1)$}
+ {}
+
+\operacion{Retroceder}{in/out it:itDPN}{}
+ {$Hay anterior(it) \land it \igobs it_0$}
+ {$comienzo(anteriores(it_0)) \igobs anteriores(it) \land ultimo(anteriores(it_0) \bullet siguientes(it_0) \igobs siguientes(it)$}
+ {Modifica el iterador, haciendolo retroceder una posicion}
+ {$O(1)$}
+ {}
+
+\subsection{Representación del iterador}
+
+\sexc{Iterador Diccionario}
+
+\serc{itLista(<clave:String, significado:\alpha>)}{}
+
+\subsection{Algoritmos del iterador}
+
+\algoritmo{CrearIterador}{in d:dpn}{res:itDPN}{
+   \State $res \larr NuevoItLista(d.ALista())$ \complejidad{O(1)}
+}{O(1)}
+
+\algoritmo{HaySiguiente}{in it:itDPN}{res:bool}{
+   \State $res \larr it.haySiguiente()$ \complejidad{O(1)}
+}{O(1)}
+
+\algoritmo{HayAnterior}{in it:itDPN}{res:bool}{
+   \State $res \larr it.hayAnterior()$ \complejidad{O(1)}
+}{O(1)}
+
+\algoritmo{Siguiente}{in it:itDPN}{res:bool}{
+   \State $res \larr it.Siguiente()$ \complejidad{O(1)}
+}{O(1)}
+
+\algoritmo{Anterior}{in it:itDPN}{res:bool}{
+   \State $res \larr it.Anterior()$ \complejidad{O(1)}
+}{O(1)}
+
+\algoritmo{SiguienteClave}{in it:itDPN}{res:String}{
+   \State $res \larr it.Siguiente().clave$ \complejidad{O(1)}
+}{O(1)}
+
+\algoritmo{AnteriorClave}{in it:itDPN}{res:String}{
+   \State $res \larr it.Anterior().clave$ \complejidad{O(1)}
+}{O(1)}
+
+\algoritmo{SiguienteSignificado}{in it:itDPN}{res:\alpha}{
+   \State $res \larr it.Siguiente().significado$ \complejidad{O(1)}
+}{O(1)}
+
+\algoritmo{AnteriorSignificado}{in it:itDPN}{res:\alpha}{
+   \State $res \larr it.Anterior().significado$ \complejidad{O(1)}
+}{O(1)}
+
+\algoritmo{Avanzar}{in/out it:itDPN}{}{
+   \State $it.avanzar()$ \complejidad{O(1)}
+}{O(1)}
+
+\algoritmo{Retroceder}{in/out it:itDPN}{}{
+   \State $it.retroceder()$ \complejidad{O(1)}
+}{O(1)}
