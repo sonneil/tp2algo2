@@ -1,169 +1,110 @@
-%\\\\\\\\\\\\!TEX root = tp2.tex
-
-
-
-\section{CampusSeguro}
+\section{Campus}
 
 \subsection{Interfaz}
 
-\sexc{CampusSeguro}
+\sexc{CAMPUS}
 $\textbf{usa}$  
-\generos{CampusSeguro}
+\generos{campus}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsubsection*{Operaciones}
 
 
-%%%%%% observadores basicos %%%%%%
-
-\operacion{campus}{in cs: campusSeguro }{res : campus}
+\operacion{ArmarCampus}{in ancho: nat, alto: nat}{res : campus}
  {true}
- {$\var{res} \igobs campus(cs)$}
- {Devuelve el campus del campusSeguro ingresado.}
- {O($1$)}
+ {$\var{res} \igobs crearCampus(ancho, alto) $}
+ {Crea el campus, sin obstáculos}
+ {O(ancho x alto)}
  {}
  
-\operacion{estudiantes}{in cs: campusSeguro }{res : conj(nombre)}
+ \operacion{agregarObs}{in/out c: campus, in p: pos}{}
+ {$ \var(c) \equiv \var(c_0) $}
+ {$\var{c} \igobs agregarObstaculo(p, c_0) $}
+ {Agrega un obstáculo al campus}
+ {O(1)}
+ {}
+ 
+  \operacion{Alto}{in c: campus}{res : nat}
  {true}
- {$\var{res} \igobs estudiantes(cs)$}
- {Devuelve un conjunto con los estudiantes del campusSeguro ingresado.}
- {O($1$)}
+ {$\var{res} \equiv alto(c) $}
+ {Indica la cantidad de filas de c}
+ {O(1)}
  {}
- 
-\operacion{hippies}{in cs: campusSeguro }{res : conj(nombre)}
+
+  \operacion{Ancho}{in c: campus}{res : nat}
  {true}
- {$\var{res} \igobs hippies(cs)$}
- {Devuelve un conjunto con los hippies del campusSeguro ingresado.}
- {O($1$)}
+ {$\var{res} \equiv alto(c) $}
+ {Indica la cantidad de columnas de c}
+ {O(1)}
  {}
-
-\operacion{agentes}{in cs: campusSeguro }{res : conj(agentes)}
+  
+  \operacion{Ocupada}{in c: campus, p: pos}{res : bool}
+ {PosValida(c,p)}
+ {$\var{res} \iff \pi_1(grilla(c)[\pi_1(p)][\pi_2(p)])  $}
+ {Comprueba si una posición está ocupada}
+ {O(1)}
+ {}
+   
+  \operacion{PosValida}{in c: campus, p: pos}{res : bool}
  {true}
- {$\var{res} \igobs agentes(cs)$}
- {Devuelve un conjunto con los agentes del campusSeguro ingresado.}
- {O($1$)}
+ {$\var{res} \iff (\pi_1(p)<ancho(c)\land \pi_2(p)<alto(c)) $}
+ {Comprueba que una posición exista dentro del campus.}
+ {O(1)}
+ {}
+    
+  \operacion{EsIngreso}{in c: campus, p: pos}{res : bool}
+ {PosValida(c,p)}
+ {$\var{res} \iff (\pi_2(p)=alto(c)-1 \lor \pi_2(p)=0) $}
+ {Comprueba si una posición es un ingreso al campus.}
+ {O(1)}
+ {}
+   
+  \operacion{IngresoSup}{in c: campus, p: pos}{res : bool}
+ {PosValida(c,p)}
+ {$\var{res} \iff \pi_2(p)=0 $}
+ {Comprueba si una posición es un ingreso superior al campus.}
+ {O(1)}
  {}
  
-\operacion{PosicionEstudiantesYHippies}{in id: nombre, cs: campusSeguro }{res : posicion}
- {$id \in (estudiantes(cs) \cup hippies(cs))$}
- {$\var{res} \igobs posEstudianteYHippie(id, cs)$}
- {Devuelve la posicion del estudiante o hippie ingresado.}
- {O($|n_m|$)}
+ \operacion{IngresoInf}{in c: campus, p: pos}{res : bool}
+ {PosValida(c,p)}
+ {$\var{res} \iff \pi_2(p)=alto(c)-1 $}
+ {Comprueba si una posición es un ingreso superior al campus.}
+ {O(1)}
  {}
 
-\operacion{PosicionAgente}{in a: agente, cs: campusSeguro }{res : posicion}
- {$a \in agentes(cs)$}
- {$\var{res} \igobs posAgente(a, cs)$}
- {Devuelve la posicion del agente ingresado.}
- {O($1$)}
- {}
- 
-\operacion{CantidadSanciones}{in a: agente, cs: campusSeguro }{res : nat}
- {$a \in agentes(cs)$}
- {$\var{res} \igobs cantSanciones(a, cs)$}
- {Devuelve la cantidad de sanciones del agente ingresado.}
- {O($1$)}
+ \operacion{Distancia}{in c: campus, p1: pos, p2: pos}{res : nat}
+ {$PosValida(c,p1) \land PosValida(c,p2)$}
+ {$\var{res} \equiv distancia (p1, p2, c) $}
+ {Comprueba si una posición es un ingreso inferior al campus.}
+ {O(1)}
  {}
  
-\operacion{CantidadHippiesAtrapados}{in a: agente, cs: campusSeguro }{res : nat}
- {$a \in agentes(cs)$}
- {$\var{res} \igobs cantHippiesAtrapados(a, cs)$}
- {Devuelve la cantidad de hippies atrapados por el agente ingresado.}
- {O($1$)}
+ \operacion{Vecinos}{in c: campus, p: pos}{res : conj(pos)}
+ {$PosValida(c,p)$}
+ {$\var{res} \equiv vecinos (p, c) $}
+ {devuekve el conjunto de vecinos de una posición.}
+ {O(1)}
  {}
  
- %%%%%% generadores %%%%%%%
-
-\operacion{comenzarRastrillaje}{in c: campus, d: dicc(agente posicion) }{res : campusSeguro}
-{$(\paratodo{agente}{a})(def?(a, d) \impluego (posValida?(obtener(a, d)) \land \neg ocupada?(obtener(a, d), c))) \land $\\$ (\paratodo{agente}{a, a2}) ((def?(a, d) \land def?(a2, d) \land a \neq a2) \impluego obtener(a, d) \neq obtener(a2, d)$}
-{$\var{res} \igobs comenzarRastrillaje(c, d)$}
-{Crea un nuevo campusSeguro con campus y los agentes ingresados.}
-{O($1$)}
-{}
- 
-\operacion{ingresarEstudiante}{in e: nombre, p: posicion, in/out cs: campusSeguro }{}
-{$\var(cs) \equiv \var(cs_0) \land e \notin (estudiantes(cs) \cup hippies(cs)) esIngreso?(p, campus(cs)) \land $\\$\neg estaOcupada?(p, cs))$}
-{$\var{res} \igobs ingresarEstudiante(e, p, cs_0)$}
-{Ingresa un nuevo estudiante al campus por una de las entradas.}
-{O($|n_m|$)}
-{}
-
-\operacion{ingresarHippie}{in h: nombre, p: posicion, in/out cs: campusSeguro }{}
-{$\var(cs) \equiv \var(cs_0) \land h \notin (estudiantes(cs) \cup hippies(cs)) esIngreso?(p, campus(cs)) \land $\\$\neg estaOcupada?(p, cs))$}
-{$\var{res} \igobs ingresarHippie(e, p, cs_0)$}
-{Ingresa un nuevo hippie al campus por una de las entradas.}
-{O($|n_m|$)}
-{}
-
-\operacion{moverEstudiante}{in e: nombre, d: direccion, in/out cs: campusSeguro }{}
-{$\var(cs) \equiv \var(cs_0) \land e \in estudiantes(cs) \land (seRetira(e, d, cs) \lor $\\$ (posValida?(proxPosicion(posEstudianteYHippie(e, cs), d, campus(cs)), campus(cs)) \land $\\$ \neg estaOcupada?(proxPosicion(posEstudianteYHippie(e, cs), d, campus(cs)), cs)))$}
-{$\var{res} \igobs moverEstudiante(e, d, cs_0)$}
-{Mueve un estudiante en la direccion indicada.}
-{O($|n_m|$)}
-{}
-
-\operacion{moverHippie}{in h: nombre, in/out cs: campusSeguro }{}
-{$\var(cs) \equiv \var(cs_0) \land h \in hippies(cs) \land $\\$ \neg todasOcupadas?(vecinos(posEstudianteYHippie(h, cs), campus(cs)), cs)$}
-{$\var{res} \igobs moverHippie(h, cs_0)$}
-{Mueve un hippie hacia el estudiante más cercano.}
-{O($|n_m| + N_e$)}
-{}
-
-
-\operacion{moverAgente}{in a: nombre, in/out cs: campusSeguro }{}
-{$\var(cs) \equiv \var(cs_0) \land a \in agentes(cs) \yluego cantSanciones(a, cs) \leq 3 \land $\\$ \neg todasOcupadas?(vecinos(posAgente(a, cs), campus(cs)), cs)$}
-{$\var{res} \igobs moverAgente(a, cs_0)$}
-{Mueve un agente hacia el hippie más cercano.}
-{O($|n_m| + log N_a + N_h$)}
-{}
-
-\operacion{CantidadHippies}{in cs: campusSeguro }{res : nat}
- {true}
- {$\var{res} \igobs cantHippies(cs)$}
- {Devuelve la cantidad de hippies en el campus.}
- {O($1$)}
- {}
- 
-\operacion{CantidadEstudiantes}{in cs: campusSeguro }{res : nat}
- {true}
- {$\var{res} \igobs cantEstudiantes(cs)$}
- {Devuelve la cantidad de estudiantes en el campus.}
- {O($1$)}
- {}
- 
- \operacion{MásVigilante}{in cs: campusSeguro }{res : agente}
- {true}
- {$\var{res} \igobs masVigilante(cs)$}
- {Devuelve al agente con más capturas realizadas del campus.}
- {O($1$)}
- {}
-
 Las complejidades están en función de las siguientes variables:\\
-$c$ : es una instancia del campusSeguro, \\
-$p$ : es una posición, \\
-$n$ : es el nombre de un estudiante/hippie y $|n_m|$ es la longitud más larga entre todos los nombres del campusSeguro, \\
-$d$ : es una dirección, \\
-$N_a$ : es la cantidad de agentes, \\
-$N_e$ : es la cantidad actual de estudiantes, \\
-$N_h$ : es la cantidad actual de hippies. \\
+$al$ : cantidad de filas del campus, \\
+$an$ : cantidad de columnas del campus, \\
+$k$ : la cola de paquetes más larga de todas las computadoras. 
 \\ \\
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Representación}
 
-\serc{sistema}{
+\serc{estr}{
 	\\
-	\donde{sistema}{\tupla{
-      Compus : \mbox{arreglo(arreglo(\tupla{hayHippie: bool, hayEst: bool, hayAgente: bool}, \tupla{pl:nat, nombre:string}))},
-      estudiantes: \mbox{DiccTrie(nombre:string, pos:pos)},
-      hippies: \mbox{DiccTrie(nombre:string, pos:pos)},
-      agentes: \mbox{DiccHash(pl:nat,\tupla{pos:pos,cantSanc:nat,cantCapturas:nat})},
-      masVigilante: \mbox{placa:nat},
-      conKSanciones: \mbox{\tupla{ocurrioSancion:bool, porKSanc: arreglo(placa)}}
-    }
-	}
+	\donde{estr}{\tupla{ ancho: \mbox{nat}, alto: \mbox{nat}, 
+	 grilla: \mbox {arreglo(arreglo(\tupla{Ocupado: bool, EsObst: bool, EsAgente: bool, \tupla{pl:nat, nombre:string}}))}}
+
+}	
 }
 
 \subsubsection*{Invariante de representación}
