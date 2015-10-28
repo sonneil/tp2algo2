@@ -2,8 +2,7 @@
 
 \section{Diccionario Rapido}
 
-Es un diccionario que dada un numero de placa como clave, nos da su significado
-en O(1)
+Es un diccionario que dado un numero de placa como clave, nos da su significado en promedio O(1)
 
 \subsection{Interfaz}
 
@@ -23,22 +22,22 @@ Bool, Nat, Conjunto($\alpha$)
 \subsubsection*{Operaciones}
 
 
-\operacion{crear}{in n : nat}{res : diccR(Nat,$\alpha$)}
+\operacion{crear}{in n : nat}{res : diccR(Nat,\alpha)}
  {true}
- {$#Claves(res)\igobs n$}
+ {$\#Claves(res) \igobs n$}
  {Crea un diccionario rapido.}
  {O(n)}
  {Completar Aliasing}
 
-\operacion{asignar}{in/out v : diccR(Nat,conj($\alpha$)),in p : nat,in s : $\alpha$}
- {$v \igobs v_0$ \land Definido?(p,v)
+\operacion{asignar}{in/out v:diccR(Nat;conj($\alpha$)),in p:nat,in s:$\alpha$}{}
+ {$v \igobs v_0$ $\land$ Definido?(p,v)}
  {$Definir(p , Ag(Obtener(p,v_0),s) , v)$}
- {Agrega el valor de s, al significado actual, para la clave dada.}
+ {Agrega el valor de s, al significado actual, para la clave dada}
  {O(1)}
  {Completar Aliasing}
 
-\operacion{dameS}{in/out v : diccR(Nat,conj($\alpha$)),in p : nat} {res : conj($\alpha$)}
- {Definido?(p,v)
+\operacion{dameS}{in/out v : diccR(Nat;conj(\alpha)),in p : nat}{res : conj($\alpha$)}
+ {Definido?(p,v)}
  {$Obtener(p,v)$}
  {Retorna el significado actual, para la clave dada.}
  {O(1)}
@@ -56,7 +55,7 @@ $n$ : la cantidad total de claves, definidas en el diccionario. \\
 	\\
 	\donde{acceso}{claves : arreglo(contenido)}
 	\\
-												\donde{contenido}{conjl($\alpha$}
+	\donde{contenido}{conjl($\alpha$}
 }
 
 Aclaraci\'on: cada vez que dice arreglo en esta estructura nos referimos a arreglo\_estatico y conjl es conjunto lineal
@@ -67,19 +66,13 @@ Aclaraci\'on: cada vez que dice arreglo en esta estructura nos referimos a arreg
   \item Todos los indices del arreglo, pertenecen al conjunto de claves del diccionario   
 		sin repetidos.
   \item Para todos los indices i del arreglo, contenido es igual al significado del   
-		diccionario para ese i.  
+		diccionario para ese i. 
+\end{enumerate}
 
 \rep{acceso}{a}  \\
- $1.\ \paratodo{Nat}{p}\ \fun{Definido?(a,p) = \fun{obtener}(\pi_1(c),s.CompusPorPref) $\\
-
-%\subsubsection*{FunciÃ³n de abstracciÃ³n}
- %\abs{sistema}{sist}{dcnet}{s} \\
-%$(\fun{s.} = \NULL \land \fun{*r.der} = \NULL \ssi nil?(a)) \ \oluego$ \\
-
-% $\fun{*r.izq} = izq(a) \land \fun{*r.der} = der(a) \ \land$
-%$r.val = raiz(a) $
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{enumerate}
+ \item 1. \paratodo{Nat}{p} Definido?(a,p) = obtener($\pi_1$(c),s.CompusPorPref)
+\end{enumerate}
 
 
 \subsubsection*{Funci\'on de abstracciÃ³n}
@@ -89,19 +82,15 @@ $red(dc)=$*$(s.red) \land (\forall c:compu, c\in compus(dc))( enEspera(dc,c)=$*$
 $  cantidadEnviados(dc,c)=cantidadEnviados(s,c)) \land $ \\ 
 $(\forall p:paquete,paqueteEnTransito?(dc,p)) caminoRecorrido(dc,p)=$*$(caminoRecorrido(s,p)) $
 
-\newpage
-
 \subsection{Algoritmos}
 
-\algoritmo{icrear}{in r : Nat}{res : acceso}{
+\algoritmo{icrear}{in r : Nat}{res:diccR()}{
 %inicializacion Caminos Minimos
-	\State $i\larr 0$
+	\State $i \larr 0$
 		\complejidad{O(1)}
-	\Var{p: arreglo$\_$estatico$[n])$ de conjl($\alpha$)}	
-	\State $p \larr \Fun{CrearArreglo}(n)$
-		\complejidad{O(n)}
-	\While{i$<$n} \complejidad{O(n)}
-		\State $p[i] \larr \vacio()$
+	\State $p \larr CrearArreglo(n)$ \complejidad{O(n)}
+	\While {$i<n$} \complejidad{O(n)}
+		\State $p[i] \larr vacio()$
 			\complejidad{O(1)}
 		\State $i++$	
 			\complejidad{O(1)}
@@ -118,7 +107,7 @@ $(\forall p:paquete,paqueteEnTransito?(dc,p)) caminoRecorrido(dc,p)=$*$(caminoRe
 {O(1)}
 
 
-\algoritmo{idameS}{in/out a: acceso , in p : Nat,}{res : contenido}{
+\algoritmo{idameS}{in/out a: acceso , in p : Nat}{res : contenido}{
   \State res = a[FhashPlaca(p,a)]
   	\complejidad{O(1)}
 }

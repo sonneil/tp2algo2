@@ -101,10 +101,9 @@ $k$ : la cola de paquetes más larga de todas las computadoras.
 
 \serc{estr}{
 	\\
-	\donde{estr}{\tupla{ ancho: \mbox{nat}, alto: \mbox{nat}, 
-	 grilla: \mbox {arreglo(arreglo(\tupla{Ocupado: bool, EsObst: bool, EsAgente: bool, \tupla{pl:nat, nombre:string}}))}}
-
-}	
+	\donde{estr}{\tupla{ ancho: nat, alto: nat, 
+	   grilla: \mbox {arreglo(arreglo(\tupla{Ocupado: bool, EsObst: bool, EsAgente: bool}, \tupla{pl:nat, nombre:string}))}}
+  }	
 }
 
 \subsubsection*{Invariante de representación}
