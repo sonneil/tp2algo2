@@ -1,153 +1,31 @@
 %\\\\\\\\\\\\!TEX root = tp2.tex
 
-
-
-\section{CampusSeguro}
+\section{DCNet}
 
 \subsection{Interfaz}
 
-\sexc{CampusSeguro}
+\sexc{AS}
 $\textbf{usa}$  
-\generos{CampusSeguro}
+\generos{as}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsubsection*{Operaciones}
 
 
-%%%%%% observadores basicos %%%%%%
-
-\operacion{campus}{in cs: campusSeguro }{res : campus}
+\operacion{crearSistema}{in r: red}{res : dcnet}
  {true}
- {$\var{res} \igobs campus(cs)$}
- {Devuelve el campus del campusSeguro ingresado.}
- {O($1$)}
- {}
+ {$\var{res} \igobs iniciarDCNet(r)$}
+ {Crea un sistema DCNet.}
+ {O($L \times n^5$)}
+ {res.red es un puntero a la red que recibimos por parámetro}
  
-\operacion{estudiantes}{in cs: campusSeguro }{res : conj(nombre)}
- {true}
- {$\var{res} \igobs estudiantes(cs)$}
- {Devuelve un conjunto con los estudiantes del campusSeguro ingresado.}
- {O($1$)}
- {}
- 
-\operacion{hippies}{in cs: campusSeguro }{res : conj(nombre)}
- {true}
- {$\var{res} \igobs hippies(cs)$}
- {Devuelve un conjunto con los hippies del campusSeguro ingresado.}
- {O($1$)}
- {}
-
-\operacion{agentes}{in cs: campusSeguro }{res : conj(agentes)}
- {true}
- {$\var{res} \igobs agentes(cs)$}
- {Devuelve un conjunto con los agentes del campusSeguro ingresado.}
- {O($1$)}
- {}
- 
-\operacion{PosicionEstudiantesYHippies}{in id: nombre, cs: campusSeguro }{res : posicion}
- {$id \in (estudiantes(cs) \cup hippies(cs))$}
- {$\var{res} \igobs posEstudianteYHippie(id, cs)$}
- {Devuelve la posicion del estudiante o hippie ingresado.}
- {O($|n_m|$)}
- {}
-
-\operacion{PosicionAgente}{in a: agente, cs: campusSeguro }{res : posicion}
- {$a \in agentes(cs)$}
- {$\var{res} \igobs posAgente(a, cs)$}
- {Devuelve la posicion del agente ingresado.}
- {O($1$)}
- {}
- 
-\operacion{CantidadSanciones}{in a: agente, cs: campusSeguro }{res : nat}
- {$a \in agentes(cs)$}
- {$\var{res} \igobs cantSanciones(a, cs)$}
- {Devuelve la cantidad de sanciones del agente ingresado.}
- {O($1$)}
- {}
- 
-\operacion{CantidadHippiesAtrapados}{in a: agente, cs: campusSeguro }{res : nat}
- {$a \in agentes(cs)$}
- {$\var{res} \igobs cantHippiesAtrapados(a, cs)$}
- {Devuelve la cantidad de hippies atrapados por el agente ingresado.}
- {O($1$)}
- {}
- 
- %%%%%% generadores %%%%%%%
-
-\operacion{comenzarRastrillaje}{in c: campus, d: dicc(agente posicion) }{res : campusSeguro}
-{$(\paratodo{agente}{a})(def?(a, d) \impluego (posValida?(obtener(a, d)) \land \neg ocupada?(obtener(a, d), c))) \land $\\$ (\paratodo{agente}{a, a2}) ((def?(a, d) \land def?(a2, d) \land a \neq a2) \impluego obtener(a, d) \neq obtener(a2, d)$}
-{$\var{res} \igobs comenzarRastrillaje(c, d)$}
-{Crea un nuevo campusSeguro con campus y los agentes ingresados.}
-{O($1$)}
-{}
- 
-\operacion{ingresarEstudiante}{in e: nombre, p: posicion, in/out cs: campusSeguro }{}
-{$\var(cs) \equiv \var(cs_0) \land e \notin (estudiantes(cs) \cup hippies(cs)) esIngreso?(p, campus(cs)) \land $\\$\neg estaOcupada?(p, cs))$}
-{$\var{res} \igobs ingresarEstudiante(e, p, cs_0)$}
-{Ingresa un nuevo estudiante al campus por una de las entradas.}
-{O($|n_m|$)}
-{}
-
-\operacion{ingresarHippie}{in h: nombre, p: posicion, in/out cs: campusSeguro }{}
-{$\var(cs) \equiv \var(cs_0) \land h \notin (estudiantes(cs) \cup hippies(cs)) esIngreso?(p, campus(cs)) \land $\\$\neg estaOcupada?(p, cs))$}
-{$\var{res} \igobs ingresarHippie(e, p, cs_0)$}
-{Ingresa un nuevo hippie al campus por una de las entradas.}
-{O($|n_m|$)}
-{}
-
-\operacion{moverEstudiante}{in e: nombre, d: direccion, in/out cs: campusSeguro }{}
-{$\var(cs) \equiv \var(cs_0) \land e \in estudiantes(cs) \land (seRetira(e, d, cs) \lor $\\$ (posValida?(proxPosicion(posEstudianteYHippie(e, cs), d, campus(cs)), campus(cs)) \land $\\$ \neg estaOcupada?(proxPosicion(posEstudianteYHippie(e, cs), d, campus(cs)), cs)))$}
-{$\var{res} \igobs moverEstudiante(e, d, cs_0)$}
-{Mueve un estudiante en la direccion indicada.}
-{O($|n_m|$)}
-{}
-
-\operacion{moverHippie}{in h: nombre, in/out cs: campusSeguro }{}
-{$\var(cs) \equiv \var(cs_0) \land h \in hippies(cs) \land $\\$ \neg todasOcupadas?(vecinos(posEstudianteYHippie(h, cs), campus(cs)), cs)$}
-{$\var{res} \igobs moverHippie(h, cs_0)$}
-{Mueve un hippie hacia el estudiante más cercano.}
-{O($|n_m| + N_e$)}
-{}
-
-
-\operacion{moverAgente}{in a: nombre, in/out cs: campusSeguro }{}
-{$\var(cs) \equiv \var(cs_0) \land a \in agentes(cs) \yluego cantSanciones(a, cs) \leq 3 \land $\\$ \neg todasOcupadas?(vecinos(posAgente(a, cs), campus(cs)), cs)$}
-{$\var{res} \igobs moverAgente(a, cs_0)$}
-{Mueve un agente hacia el hippie más cercano.}
-{O($|n_m| + log N_a + N_h$)}
-{}
-
-\operacion{CantidadHippies}{in cs: campusSeguro }{res : nat}
- {true}
- {$\var{res} \igobs cantHippies(cs)$}
- {Devuelve la cantidad de hippies en el campus.}
- {O($1$)}
- {}
- 
-\operacion{CantidadEstudiantes}{in cs: campusSeguro }{res : nat}
- {true}
- {$\var{res} \igobs cantEstudiantes(cs)$}
- {Devuelve la cantidad de estudiantes en el campus.}
- {O($1$)}
- {}
- 
- \operacion{MásVigilante}{in cs: campusSeguro }{res : agente}
- {true}
- {$\var{res} \igobs masVigilante(cs)$}
- {Devuelve al agente con más capturas realizadas del campus.}
- {O($1$)}
- {}
-
 Las complejidades están en función de las siguientes variables:\\
-$c$ : es una instancia del campusSeguro, \\
-$p$ : es una posición, \\
-$n$ : es el nombre de un estudiante/hippie y $|n_m|$ es la longitud más larga entre todos los nombres del campusSeguro, \\
-$d$ : es una dirección, \\
-$N_a$ : es la cantidad de agentes, \\
-$N_e$ : es la cantidad actual de estudiantes, \\
-$N_h$ : es la cantidad actual de hippies. \\
+$n$ : la cantidad total de computadoras que hay en el sistema, \\
+$L$ : el hostname más largo de todas las computadoras, \\
+$k$ : la cola de paquetes más larga de todas las computadoras. 
 \\ \\
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -156,63 +34,43 @@ $N_h$ : es la cantidad actual de hippies. \\
 \serc{sistema}{
 	\\
 	\donde{sistema}{\tupla{
-      Compus : \mbox{arreglo(arreglo(\tupla{hayHippie: bool, hayEst: bool, hayAgente: bool}, \tupla{pl:nat, nombre:string}))},
-      estudiantes: \mbox{DiccTrie(nombre:string, pos:pos)},
-      hippies: \mbox{DiccTrie(nombre:string, pos:pos)},
-      agentes: \mbox{DiccHash(pl:nat,\tupla{pos:pos,cantSanc:nat,cantCapturas:nat})},
+      Campus : \mbox{arreglo(arreglo(\tupla{hayHippie: bool, hayEst: bool, hayAgente: bool, hayObst:bool, pl:itLista(agente), estudiante:itDPN(\tupla{nombre:string,pos:pos}), hippie:itDPN(\tupla{nombre:String,pos:pos})}))},
+      estudiantes: \mbox{DiccPorNombre(nombre:string, pos:pos)},
+      hippies: \mbox{DiccPorNombre(nombre:string, pos:pos)},
+      agentes: \mbox{DiccSuperRapido(pl:nat,\tupla{pos:pos,cantSanc:nat,cantCapturas:nat,mismas:itLista(conMismasBucket),miUbicacion:itLista(agente)})},
       masVigilante: \mbox{placa:nat},
-      conKSanciones: \mbox{\tupla{ocurrioSancion:bool, porKSanc: arreglo(placa)}}
+      porSanciones: \mbox{Lista(conMismasBucket)},
+      conKSanciones: \mbox{arreglo(\tupla{ocurrioSancion:bool,porKSanc:conj(agente),\#Sanciones:nat})}
     }
 	}
+  \donde{conMismasBucket}{
+      \tupla{
+            agentes:\mbox{Lista(agente)},
+            \#Sanc:\mbox{nat},
+            conMasSanciones:\mbox{itLista(conMismasBucket)},
+            conMenosSanciones:\mbox{itLista(conMismasBucket)}
+        }
+     }
 }
 
 \subsubsection*{Invariante de representación}
 
 \begin{enumerate}
-  \item Todos los IP de \textit{compus} pertenecen al conjunto de claves de \textit{CompusPorPref} y la longitud de dicho arreglo 
-		es igual al cardinal de las claves del diccionario. 
-  \item Los pN de las tuplas que tiene el arreglo \textit{compus} apuntan al conjunto de paquetes(PorNom) 
-		de un significado en \textit{CompusPorPref} cuya clave es igual al IP de esa posición en el arreglo.
-  \item Los pN' apuntan al conjuno de paquetes(porNom') de un significado en \textit{CompusPorPref} cuya clave es igual al IP 
-		de esa posición en el arreglo
-  \item Los paquetes del significado pN' son iguales a los paquetes de pN
-  \item El origen de pN' es distinto al destino de pN' y ambos son posiciones válidas del arreglo compus
-  \item PosActual de pN' es una posicion válida del arreglo compus
-  \item La $\#PaquetesEnviados$ de cada compu es mayor o igual a la actual cantidad total de paquetes que pasaron por esa compu
-  \item Todos los conjuntos de los significados de \textit{CompusPorPref} son disjuntos dos a dos.
-  \item Los conjuntos de los campos de la tupla PorNom, PorPrior son iguales.
-  \item La matriz de caminosMinimos es cuadrada de lado n, con n igual al tamaño del arreglo de compus.
-  \item Para cualquier compu en el sistema f,d caminosMinimos[f][d] se corresponde con caminoMinimo(red,f,d)
-  \item La longitud de \textit{CaminosMinimos} es igual a la longitud del arreglo que tiene \textit{CaminosMinimos} en cada posición.
-  \item La longitud del arreglo, que tiene un arreglo de \textit{CaminosMinimos} es menor o igual a la longitud de \textit{CaminosMinimos}.
-  \item Los elementos del arreglo anteriormente mencionado son IPs del diccionario \textit{CompusPorPref} y no tiene repetidos.
-  \item La computadora que más paquetes envió es aquella cuyo índice es igual a \textit{LaQMasEnvio}
+  \item En cada posicion de campus hay como m\'aximo una entidad (agente, estudiante, hippie, obstaculo)
+  \item Si hayEst, hayHippie o hayAgente es true en alguna posici\'on, entonces el iterador correspondiente debe tener siguiente y apuntar a un lugar en el contenedor correspondiente
+  \item No puede haber dos iteradores que apunten a lo mismo
+  \item La cantidad de agentes, hippies y estudiantes en campus debe ser igual al tamaño de su correspondiente contenedor
+  \item MasVigilante es el que mas hippiesCapturados tiene. En caso de empate, el que mayor nro de placa tiene
+  \item El conjunto de todos los agentes en porSanciones es igual a las claves del dicc de agentes
+  \item Si ocurrio sancion, el conjunto de agentes formado por la uni\'on de los conjuntos en cada posicion de conkSanciones es igual a las claves del dicc de agentes
+  \item porSanciones est\'a ordenado por \#sanciones y en caso de empate por nro de placa
+  \item Si ocurrio sancion, entonces, conKSanciones es 'una copia' (sin iteradores y pasando de lista de agentes a conj) de la lista de porSanciones
+  \item conKSanciones es\'a ordenado por \#sanciones y en caso de empate por nro de placa
+
+
 \end{enumerate}
 
 \rep{sistema}{s}  \\
- $1.\ \paratodo{String}{s}\ \fun{$def?$}(s, s.CompusPorPref), (\exists c : compu), \fun{$esta?$}(c,s.Compus)\ \land\ \pi_1(c) = s\ \land\ \fun{longitud}(s.Compus) = \#\Fun{claves}(s.CompusPorPref)$\\
- $2.\ \paratodo{compu}{c}\ \fun{esta?}(c, s.Compus), *\pi_2(c) = \fun{obtener}(\pi_1(c),s.CompusPorPref) $\\
- $3.\ \paratodo{compu}{c}\ \fun{esta?}(c, s.Compus), *\pi_3(c) = \fun{obtener}(\pi_3(c),s.CompusPorPref) $\\
- $4,5,6.$ \\$\ (\paratodo{nat}{c})\ 0 \le c < Longitud(s.compus) \impluego$\\
-  \indent $\ \ Longitud(s.compus[c].pN) = Longitud(s.compus[c].pN')$ $\land$ \\
-  \indent $\ \ (\paratodo{paquetePos}{p}) \fun{esta?}(p,s.compus[c].pN') \impluego$\\
-  \indent \indent \indent $\ \ \ \ \fun{esta}(\pi_1(p), s.compus[c].pN)$ $\land$ $0 \le indiceOrigen(p) < Longitud(s.compus)$\\
-  \indent \indent \indent $\ \ \ \ \land$ $0 \le indiceDestino(p) < Longitud(s.compus)$\\
-  \indent \indent \indent $\ \ \ \ \land$ $\ 0 \le posActual(p) < Longitud(s.compus)$\\
-  \indent \indent \indent $\ \ \ \ \land$ $\ \neg(indiceDestino(p)=indiceOrigen(p))$\\
- $7.\ \ (\paratodo{nat}{c})$ $0 \le c < Longitud(s.compus)$ $\impluego$\\
- \indent \indent $\ \ (\paratodo{paquetePos}{p})$ $\fun{pertenece}(s.compus[c].pN', p)$ $\impluego$\\
- \indent \indent \indent $\ \ \ \ \beta(\fun{esta}(s.compus[c],caminoMinimo(s.red,s.compus[indiceOrigen(p)],s.compus[posActual(p)])))$\\
- $8.\ \ \paratodo{String}{s,t}\ \fun{def?}(s, s.CompusPorPref)\ \land\ \fun{def?}(t, s.CompusPorPref)\ \land\ s \neq t \impluego \\ \fun{obtener}(s, s.CompusPorPref)\ \bigcap\ \fun{obtener}(t, s.CompusPorPref) = \emptyset$\\
- $9.\ \paratodo{String}{s}\ \fun{def?}(s, s.CompusPorPref)\ \impluego\ \pi_1(\fun{obtener}(s, s.CompusPorPref)) =\\ \pi_2(\fun{obtener}(s, s.CompusPorPref))$ \\
- $10.\ Longitud(s.compus) = Longitud(CaminosMinimos(s))$ $\land$\\
- \indent \indent \indent \indent$\ \ \ (\paratodo{nat}{i})$ $0 \le i < Longitud(s.compus)$ $\impluego$\\
- \indent \indent \indent \indent$\ \ \ \ \ Longitud(s.CaminosMinimos[i]) = Longitud(s.compus)$\\
- $11.\ (\paratodo{nat}{f,d})$ $\neg(f=d) \land$ $0 \le f,d < Longitud(s.compus)$ $\impluego$\\
- \indent \indent $\ \ \ CaminosMinimos[f][d]$ $=$\\
- \indent \indent $\ \ \ caminoMinimo(s.red,ipACompu(s.red,\pi_1(s.compus[f])),ipACompu(s.red,\pi_1(s.compus[d])))$\\
- $12,13,14.\ (\paratodo{nat}{i,j}),\ 0 \leq i,j < \fun{longitud}(s.CaminosMinimos) \impluego \fun{longitud}(s.CaminosMinimos) = \fun{longitud}(s.CaminosMinimos[i])\ \land\ \fun{longitud}(s.CaminosMinimos[i][j]) < \fun{longitud}(s.CaminosMinimos)\ \land\ (\paratodo{nat}{e}), \fun{esta?}(e, s.CaminosMinimos[i][j]) \Rightarrow \fun{pertenece}(e,s.CompusPorPref)  $\\
- $15. \paratodo{compu}{c}\ \fun{esta?}(c, s.Compus)\ \impluego\ \pi_3(c) \leq \pi_3(s.Compus[s.LaQMasEnvio])$
 %\subsubsection*{Función de abstracción}
  %\abs{sistema}{sist}{dcnet}{s} \\
 %$(\fun{s.} = \NULL \land \fun{*r.der} = \NULL \ssi nil?(a)) \ \oluego$ \\
