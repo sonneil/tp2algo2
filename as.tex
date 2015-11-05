@@ -1,6 +1,6 @@
 %\\\\\\\\\\\\!TEX root = tp2.tex
 
-\section{DCNet}
+\section{CampusSeguro}
 
 \subsection{Interfaz}
 
@@ -10,15 +10,151 @@ $\textbf{usa}$
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\subsection{Interfaz}
+
+\sexc{CampusSeguro}
+$\textbf{usa}$  
+\generos{CampusSeguro}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \subsubsection*{Operaciones}
 
 
-\operacion{crearSistema}{in r: red}{res : dcnet}
+%%%%%% observadores basicos %%%%%%
+
+\operacion{campus}{in cs: campusSeguro }{res : campus}
  {true}
- {$\var{res} \igobs iniciarDCNet(r)$}
- {Crea un sistema DCNet.}
- {O($L \times n^5$)}
- {res.red es un puntero a la red que recibimos por parámetro}
+ {$\var{res} \igobs campus(cs)$}
+ {Devuelve el campus del campusSeguro ingresado.}
+ {O($1$)}
+ {}
+ 
+\operacion{estudiantes}{in cs: campusSeguro }{res : conj(nombre)}
+ {true}
+ {$\var{res} \igobs estudiantes(cs)$}
+ {Devuelve un conjunto con los estudiantes del campusSeguro ingresado.}
+ {O($1$)}
+ {}
+ 
+\operacion{hippies}{in cs: campusSeguro }{res : conj(nombre)}
+ {true}
+ {$\var{res} \igobs hippies(cs)$}
+ {Devuelve un conjunto con los hippies del campusSeguro ingresado.}
+ {O($1$)}
+ {}
+
+\operacion{agentes}{in cs: campusSeguro }{res : conj(agentes)}
+ {true}
+ {$\var{res} \igobs agentes(cs)$}
+ {Devuelve un conjunto con los agentes del campusSeguro ingresado.}
+ {O($1$)}
+ {}
+ 
+\operacion{PosicionEstudiantesYHippies}{in id: nombre, cs: campusSeguro }{res : posicion}
+ {$id \in (estudiantes(cs) \cup hippies(cs))$}
+ {$\var{res} \igobs posEstudianteYHippie(id, cs)$}
+ {Devuelve la posicion del estudiante o hippie ingresado.}
+ {O($|n_m|$)}
+ {}
+
+\operacion{PosicionAgente}{in a: agente, cs: campusSeguro }{res : posicion}
+ {$a \in agentes(cs)$}
+ {$\var{res} \igobs posAgente(a, cs)$}
+ {Devuelve la posicion del agente ingresado.}
+ {O($1$)}
+ {}
+ 
+\operacion{CantidadSanciones}{in a: agente, cs: campusSeguro }{res : nat}
+ {$a \in agentes(cs)$}
+ {$\var{res} \igobs cantSanciones(a, cs)$}
+ {Devuelve la cantidad de sanciones del agente ingresado.}
+ {O($1$)}
+ {}
+ 
+\operacion{CantidadHippiesAtrapados}{in a: agente, cs: campusSeguro }{res : nat}
+ {$a \in agentes(cs)$}
+ {$\var{res} \igobs cantHippiesAtrapados(a, cs)$}
+ {Devuelve la cantidad de hippies atrapados por el agente ingresado.}
+ {O($1$)}
+ {}
+ 
+ %%%%%% generadores %%%%%%%
+
+\operacion{comenzarRastrillaje}{in c: campus, d: dicc(agente posicion) }{res : campusSeguro}
+{$(\paratodo{agente}{a})(def?(a, d) \impluego (posValida?(obtener(a, d)) \land \neg ocupada?(obtener(a, d), c))) \land $\\$ (\paratodo{agente}{a, a2}) ((def?(a, d) \land def?(a2, d) \land a \neq a2) \impluego obtener(a, d) \neq obtener(a2, d)$}
+{$\var{res} \igobs comenzarRastrillaje(c, d)$}
+{Crea un nuevo campusSeguro con campus y los agentes ingresados.}
+{O($1$)}
+{}
+ 
+\operacion{ingresarEstudiante}{in e: nombre, p: posicion, in/out cs: campusSeguro }{}
+{$\var(cs) \equiv \var(cs_0) \land e \notin (estudiantes(cs) \cup hippies(cs)) esIngreso?(p, campus(cs)) \land $\\$\neg estaOcupada?(p, cs))$}
+{$\var{res} \igobs ingresarEstudiante(e, p, cs_0)$}
+{Ingresa un nuevo estudiante al campus por una de las entradas.}
+{O($|n_m|$)}
+{}
+
+\operacion{ingresarHippie}{in h: nombre, p: posicion, in/out cs: campusSeguro }{}
+{$\var(cs) \equiv \var(cs_0) \land h \notin (estudiantes(cs) \cup hippies(cs)) esIngreso?(p, campus(cs)) \land $\\$\neg estaOcupada?(p, cs))$}
+{$\var{res} \igobs ingresarHippie(e, p, cs_0)$}
+{Ingresa un nuevo hippie al campus por una de las entradas.}
+{O($|n_m|$)}
+{}
+
+\operacion{moverEstudiante}{in e: nombre, d: direccion, in/out cs: campusSeguro }{}
+{$\var(cs) \equiv \var(cs_0) \land e \in estudiantes(cs) \land (seRetira(e, d, cs) \lor $\\$ (posValida?(proxPosicion(posEstudianteYHippie(e, cs), d, campus(cs)), campus(cs)) \land $\\$ \neg estaOcupada?(proxPosicion(posEstudianteYHippie(e, cs), d, campus(cs)), cs)))$}
+{$\var{res} \igobs moverEstudiante(e, d, cs_0)$}
+{Mueve un estudiante en la direccion indicada.}
+{O($|n_m|$)}
+{}
+
+\operacion{moverHippie}{in h: nombre, in/out cs: campusSeguro }{}
+{$\var(cs) \equiv \var(cs_0) \land h \in hippies(cs) \land $\\$ \neg todasOcupadas?(vecinos(posEstudianteYHippie(h, cs), campus(cs)), cs)$}
+{$\var{res} \igobs moverHippie(h, cs_0)$}
+{Mueve un hippie hacia el estudiante más cercano.}
+{O($|n_m| + N_e$)}
+{}
+
+
+\operacion{moverAgente}{in a: nombre, in/out cs: campusSeguro }{}
+{$\var(cs) \equiv \var(cs_0) \land a \in agentes(cs) \yluego cantSanciones(a, cs) \leq 3 \land $\\$ \neg todasOcupadas?(vecinos(posAgente(a, cs), campus(cs)), cs)$}
+{$\var{res} \igobs moverAgente(a, cs_0)$}
+{Mueve un agente hacia el hippie más cercano.}
+{O($|n_m| + log N_a + N_h$)}
+{}
+
+\operacion{CantidadHippies}{in cs: campusSeguro }{res : nat}
+ {true}
+ {$\var{res} \igobs cantHippies(cs)$}
+ {Devuelve la cantidad de hippies en el campus.}
+ {O($1$)}
+ {}
+ 
+\operacion{CantidadEstudiantes}{in cs: campusSeguro }{res : nat}
+ {true}
+ {$\var{res} \igobs cantEstudiantes(cs)$}
+ {Devuelve la cantidad de estudiantes en el campus.}
+ {O($1$)}
+ {}
+ 
+ \operacion{MásVigilante}{in cs: campusSeguro }{res : agente}
+ {true}
+ {$\var{res} \igobs masVigilante(cs)$}
+ {Devuelve al agente con más capturas realizadas del campus.}
+ {O($1$)}
+ {}
+
+Las complejidades están en función de las siguientes variables:\\
+$c$ : es una instancia del campusSeguro, \\
+$p$ : es una posición, \\
+$n$ : es el nombre de un estudiante/hippie y $|n_m|$ es la longitud más larga entre todos los nombres del campusSeguro, \\
+$d$ : es una dirección, \\
+$N_a$ : es la cantidad de agentes, \\
+$N_e$ : es la cantidad actual de estudiantes, \\
+$N_h$ : es la cantidad actual de hippies. \\
+\\ \\
+
  
 Las complejidades están en función de las siguientes variables:\\
 $n$ : la cantidad total de computadoras que hay en el sistema, \\
@@ -32,8 +168,8 @@ $k$ : la cola de paquetes más larga de todas las computadoras.
 \subsection{Representación}
 
 \serc{sistema}{
-	\\
-	\donde{sistema}{\tupla{
+  \\
+  \donde{sistema}{\tupla{
       Campus : \mbox{arreglo(arreglo(\tupla{hayHippie: bool, hayEst: bool, hayAgente: bool, hayObst:bool, pl:itLista(agente), estudiante:itDPN(\tupla{nombre:string,pos:pos}), hippie:itDPN(\tupla{nombre:String,pos:pos})}))},
       estudiantes: \mbox{DiccPorNombre(nombre:string, pos:pos)},
       hippies: \mbox{DiccPorNombre(nombre:string, pos:pos)},
@@ -42,7 +178,7 @@ $k$ : la cola de paquetes más larga de todas las computadoras.
       porSanciones: \mbox{Lista(conMismasBucket)},
       conKSanciones: \mbox{arreglo(\tupla{ocurrioSancion:bool,porKSanc:conj(agente),\#Sanciones:nat})}
     }
-	}
+  }
   \donde{conMismasBucket}{
       \tupla{
             agentes:\mbox{Lista(agente)},
@@ -92,76 +228,145 @@ $(\forall p:paquete,paqueteEnTransito?(dc,p)) caminoRecorrido(dc,p)=$*$(caminoRe
 
 \subsection{Algoritmos}
 
-\algoritmo{icrearSistema}{in r:red}{res:dcnet}{
-%inicializacion Caminos Minimos
-	\State $res.red \larr r$
-	\State $n \larr Longitud(\Fun{compus}(red))$ \complejidad{O(1)}
-	\State $i\larr 0$
-	\State $j\larr 0$
-		\complejidad{O(1)}
-	\State $res.Compus \larr \Fun{CrearArreglo}(n)$
-		\complejidad{O(n)}
-	\State $res.CaminosMinimos\larr \Fun{CrearArreglo}(n)$
-		\complejidad{O(n)}
-	\Var{p: arreglo$\_$dimensionable de puntero(conjLog(paquete))}	
-	\While{i$<$n} \complejidad{O($L*n^5$)}
-		\complejidad{O(n)}
-		\State $res.CaminosMinimos[i] \larr \Fun{CrearArreglo}(n)$ 
-			\complejidad{O(n)}
-		\State s:$ \ <nat,conjLog(paquete,<_{id}),conjLog(paquete,<_{p}), $\\$ conjLog(paquetePos,<_{id}),conjLog(paquetePos,<_{p}) >$
-		%HAY que ver bien donde definir la relacion!!
-		\State $\pi_1(s) \larr compu(r,i)$
-		\State $\pi_2(s) \larr \Fun{nuevo}()$
-		\State $\pi_3(s) \larr \Fun{nuevo}()$
-		\State $\pi_4(s) \larr \Fun{nuevo}()$
-		\State $\pi_5(s) \larr \Fun{nuevo}()$
-		\State \Fun{definir}(res.CompusPorPref,compu(r,i),s)
-			\complejidad{O(L)}
-		\State $p[i] \larr \pi_3(s)$
-		\State $p'[i] \larr \pi_5(s) $
-		\State $res.Compus[i] \larr $ $<compu(r,i),p[i],p'[i],0>$ 
-			\complejidad{O(1)}
-		\While{j$<$n} \complejidad{O($L*n^4$)}
-			\complejidad{O(n)}
-			\State $res.CaminosMinimos[i][j] \larr caminoMinimo(compu(r,i),compu(r,j),r)$
-				\complejidad{O($L*n^3$)}
-			\State $j++$
-		\EndWhile
-		\State $i++$	
-	\EndWhile
-	\State $res.LaQMasEnvio \larr 0$
-		\complejidad{O(1)}
-%holi
-}
-{O($L \times n^5$)}
+\algoritmo{campus}{in as:as}{res:campus}{
+  \State $res \larr as.campus$ \complejidad{O(1)}
+}{O(1)}
 
-\algoritmo{icrearPaquete}{in/out s:dcnet,in/out p: paquete}{}{ %hay que cambiar nombres segun heap y avl
-  \State $t_1:\ <nat,conjLog(paquete,<_{id}),conjLog(paquete,<_{p}), $\\$ conjLog(paquetePos,<_{id}),conjLog(paquetePos,<_{p}) >$
-  \State $t_1 \larr \Fun{Obtener}(origen(p),\ \var{s}.CompusPorPref)$
-        \complejidad{O($L$)}
-  \State $t_2:\ <nat,conjLog(paquete,<_{id}),conjLog(paquete,<_{p}), $\\$ conjLog(paquetePos,<_{id}),conjLog(paquetePos,<_{p}) >$
-  \State $t_2 \larr \Fun{Obtener}(destino(p),\ \var{s}.CompusPorPref)$
-  	\complejidad{O($L$)}
-  \State $p$'$:paquetePos$ 
-  \State $\Fun{indiceOrigen}(p$'$) \larr \pi_1(t_1)$
-  	\complejidad{O(1)}
-  \State $\Fun{indiceDestino}(p$'$) \larr \pi_1(t_2)$
-  	\complejidad{O(1)}
-  \State $\Fun{posActual}(p$'$) \larr 0$
-  \State \Fun{insertar}($\pi_2(t),p$) %agrega segun nombre
-        \complejidad{O($log(k)$)}
-  \State \Fun{insertar}($\pi_3(t),p$) %agrega segun prioridad
-        \complejidad{O($log(k)$)}
-  \State \Fun{insertar}($\pi_4(t),p$') %agrega segun nombre
-        \complejidad{O($log(k)$)}
-  \State \Fun{insertar}($\pi_5(t),p$') %agrega segun prioridad
-        \complejidad{O($log(k)$)}
-}
-{O($L + log(k)$)}
+\algoritmo{agentes}{in as:as}{res:itDiccSuperRapido(agente)}{
+  \State $res \larr CrearItSuperRapido(as.agentes)$ \complejidad{O(1)}
+}{O(1)}
+
+\algoritmo{estudiantes}{in as:as}{res:itDPN(<estudiante:String,pos:pos>)}{
+  \State $res \larr CrearItDPN(as.estudiantes)$ \complejidad{O(1)}
+}{O(1)}
+
+\algoritmo{hippies}{in as:as}{res:itDPN(<hippie:String,pos:pos>)}{
+  \State $res \larr CrearItDPN(as.estudiantes)$ \complejidad{O(1)}
+}{O(1)}
+
+\algoritmo{posEstudiantesYHippies}{in as:as, in nombre:string}{res:pos}{
+  \If {$as.estudiantes.definido?(nombre)$} \complejidad{O(long(nombre))}
+    \State $return$ $res \larr as.estudiantes.obtener(nombre)$  \complejidad{O(long(nombre))}
+  \EndIf
+  \If {$as.hippies.definido?(nombre)$}  \complejidad{O(long(nombre))}
+    \State $return$ $res \larr as.hippies.obtener(nombre)$  \complejidad{O(long(nombre))}
+  \EndIf
+ }{O(long(nombre))}
+
+ \algoritmo{posAgente}{in as:as, in placa:agente}{res:pos}{
+    \State $res \larr as.agentes.dameS(placa).pos$ \complejidad{$\theta$(1)}
+ }{$\theta$(1)}
+
+  \algoritmo{cantSanciones}{in as:as, in placa:agente}{res:pos}{
+    \State $res \larr as.agentes.dameS(placa).cantSanciones$ \complejidad{$\theta$(1)}
+ }{$\theta$(1)}
+
+  \algoritmo{cantHippiesAtrapados}{in as:as, in placa:agente}{res:pos}{
+    \State $res \larr as.agentes.dameS(placa).cantHippiesAtrapados$ \complejidad{$\theta$(1)}
+ }{$\theta$(1)}
+
+  \algoritmo{ingresarEstudiante}{in/out as:as, in nombre:string, in pos:pos}{}{
+    % Para cada agente 'a' alrededor de un vecino hippie que quedo atrapado: AtraparHippie(a,p)
+    % Sancionar a todos los agentes vecinos de los estudiantes vecinos encerrados
+    % Convertir a los hippies que quedaron encerrados por 4 estudiantes o eliminar a los que quedaron atrapados por agentes
+    
+    
+    % Si quedo atrapado: Sancionar a los agentes que estan alrededor
+    % Si se hippifica:
+        % Si hippieAtrapado: - Para todos los agentes vecinos 'a': AtraparHippie(a,p) 
+        % Sino: Agregar hippie al diccionario de hippies
+    % Sino: Agregar el estudiante al diccionario de estudiantes
+
+
+    %%% Operaciones auxiliares faltantes:
+    %%%     - obtenerVecinos: retorna las posiciones vecinas de una posicion (Puede ser de campus, pero creo que campus solo deberia ser una matriz estatica)
+    %%%     - atrapadoPorAgente?: Indica si una posicion fue atrapada por agentes (hay al menos un agente entre los que lo rodean)
+    %%%     - sancionarAgente: La operacion mas compleja, actualiza porSanciones y el hash de agentes
+    %%%     - hippieAEst?: Indica si un hippie esta completamente rodeado por estudiantes, en ese caso se convierte a estudiante
+
+    %%
+    \State $as.agregarEstudiante(as, pos, nombre)$ \complejidad{O(long(nombre))}
+
+
+    %% Sanciono a los agentes que rodean a los estudiantes atrapados al ingresar uno nuevo
+    \State // Sanciono a los agentes que rodean a los estudiantes atrapados al ingresar uno nuevo    
+    \If {$as.atrapadoPorAgente?(pos)$}
+      \State $as.sancionarAgentesVecinos(pos)$ \complejidad{O(1)}
+    \EndIf
+    \\
+    \\
+    %%%% TODO: Hippificarlo: Ver especificacion
+    \State // Hippificar al estudiante
+    \If {$as.estAHippie?(pos)$}
+      \State $as.hippificar(pos)$ \complejidad{O(long(nombre))}
+    \EndIf
+    \\
+    \\
+    %%%% Convertir a los hippies que quedaron encerrados por 4 estudiantes o eliminar a los que quedaron atrapados por agentes
+    %%%% Funciona bien porque los vecinos de una posicion no son vecinos entre ellos
+    \State // Convertir a los hippies que quedaron encerrados por 4 estudiantes o eliminar a los que quedaron atrapados por agentes
+    \State $as.aplicarHippiesVecinos(pos)$ \complejidad{O(long(nombre))}
+
+    %%%% aplicarHippiesVecinos
+    %\State $vecinos \larr as.obtenerVecinos(pos)$ \complejidad{O(1)}
+    % \State $//$ La cantidad de vecinos es como maximo 4
+    % \While {$i < vecinos.tamanio()$}  \complejidad{O(long(nombre))}
+    %     \If {$as.campus[vecinos[i].x][vecinos[i].y].hayHippie?$ $&&$ $as.hippieAEst?(vecinos[i])$}
+    %         \State $as.campus[vecinos[i].x][vecinos[i].y].hayEst? = True$ \complejidad{O(1)}
+    %         \State $as.campus[vecinos[i].x][vecinos[i].y].hayHippie? = False$ \complejidad{O(1)}
+    %         \State $as.hippies.eliminar(as.campus[vecinos[i].x][vecinos[i].y].hippie.siguienteClave())$ \complejidad{O(long(nombre))}
+    %         \State $as.estudiantes.definir(as.campus[vecinos[i].x][vecinos[i].y].estudiante.siguienteClave())$ \complejidad{O(long(nombre))}
+    %     \Else
+    %         \If {$as.campus[vecinos[i].x][vecinos[i].y].hayHippie?$ $\land$ $atrapadoPorAgente(vecinos[i])$}
+    %             \State $as.campus[vecinos[i].x][vecinos[i].y].hayHippie? = False$ \complejidad{O(1)}
+    %             \State $as.hippies.eliminar(as.campus[vecinos[i].x][vecinos[i].y].hippie.siguienteClave())$ \complejidad{O(long(nombre))}
+    %         \EndIf
+    %     \State $i++$
+    % \EndWhile
+    %% FIN AplicarHippiesVecinos
+
+    \\
+    %%%% TODO: Si hay hippie: Capturar hippie en pos actual
+    %%%%       Sino: agregar el estudiante al diccionario
+    \If {$as.campus[pos.x][pos.y].hayHippie?$} 
+        \State $capturarHippie(pos)$ \complejidad{O(long(nombre))}
+    \EndIf
+ }{O(long(nombre))}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{Servicios Usados}
-Del modulo ConjLog requerimos \fun{pertenece}, \fun{buscar}, \fun{menor}, \fun{insertar} y \fun{borrar} en O($log(k)$) .
+\subsection{Algoritmos operaciones auxiliares}
+ \algoritmo{sancionarAgentesVecinos}{in/out as:as, in pos:pos}{}{
+    % Sancionar VECINOS
+    \State $vecinos \larr as.campusEstatico.obtenerVecinos(pos)$ \complejidad{O(1)}
+    \State $//$ La cantidad de vecinos es como maximo 4
+    \If {$as.atrapadoPorAgente?(pos, vecinos)$} 
+       \While {$i < vecinos.tamanio()$}  \complejidad{O(1)}
+           \If {$as.campus[vecinos[i].x][vecinos[i].y].hayAgente?$}
+               \State $as.sancionarAgente(vecinos[i].agente.siguiente)$ \complejidad{O(1)}
+           \EndIf
+           \State $i++$
+       \EndWhile
+    \EndIf
+ }{O(1)}
 
-Del modulo Diccionario Por Prefijos requerimos \fun{Def?}, \fun{obtener} en O($L$).
+ \algoritmo{atrapadoPorAgente?}{in pos:pos, in vecinos:arreglo(pos)}{res:bool}{
+    \State $alMenos1Agente \larr False$ \complejidad{O(1)}
+    \State $i \larr 0$
+    \While {$i<vecinos.tamanio()$} \complejidad{O(1)}
+       \If {$as.campus[vecinos[i].x][vecinos[i].y].hayAgente?$}
+          \State $alMenos1Agente$ $\larr$ $True$
+          \State $i \larr vecinos.tamanio()$
+        \EndIf
+
+        \If {$(as.campus[vecinos[i].x][vecinos[i].y].hayAgente?$ $\lor$
+             $as.campus[vecinos[i].x][vecinos[i].y].hayEst?$ $\lor$
+             $as.campus[vecinos[i].x][vecinos[i].y].hayHippie?$ $\lor$
+             $as.campus[vecinos[i].x][vecinos[i].y].hayHippie?)$}
+              \State $return$ $false$ \complejidad{O(1)}
+        \EndIf
+        \State $i++$
+    \EndWhile
+
+    \State $res$ $\larr$ $alMenos1Agente$
+ }{O(1)}
