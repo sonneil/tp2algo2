@@ -170,6 +170,7 @@ $k$ : la cola de paquetes más larga de todas las computadoras.
 \serc{sistema}{
   \\
   \donde{sistema}{\tupla{
+      CampusEstatico: \mbox{Campus},
       Campus : \mbox{arreglo(arreglo(\tupla{hayHippie: bool, hayEst: bool, hayAgente: bool, hayObst:bool, pl:itLista(agente), estudiante:itDPN(\tupla{nombre:string,pos:pos}), hippie:itDPN(\tupla{nombre:String,pos:pos})}))},
       estudiantes: \mbox{DiccPorNombre(nombre:string, pos:pos)},
       hippies: \mbox{DiccPorNombre(nombre:string, pos:pos)},
@@ -181,10 +182,8 @@ $k$ : la cola de paquetes más larga de todas las computadoras.
   }
   \donde{conMismasBucket}{
       \tupla{
-            agentes:\mbox{Lista(agente)},
-            \#Sanc:\mbox{nat},
-            conMasSanciones:\mbox{itLista(conMismasBucket)},
-            conMenosSanciones:\mbox{itLista(conMismasBucket)}
+            agentes:\mbox{Conj(agente)},
+            \#Sanc:\mbox{nat}
         }
      }
 }
@@ -289,23 +288,21 @@ $(\forall p:paquete,paqueteEnTransito?(dc,p)) caminoRecorrido(dc,p)=$*$(caminoRe
 
 
     %% Sanciono a los agentes que rodean a los estudiantes atrapados al ingresar uno nuevo
-    \State // Sanciono a los agentes que rodean a los estudiantes atrapados al ingresar uno nuevo    
-    \If {$as.atrapadoPorAgente?(pos)$}
-      \State $as.sancionarAgentesVecinos(pos)$ \complejidad{O(1)}
-    \EndIf
+    \State // Sanciono a los agentes que rodean a los estudiantes atrapados al ingresar uno nuevo
+    \State $as.sancionarAgentesVecinos(as,pos)$ \complejidad{O(1)}
     \\
     \\
     %%%% TODO: Hippificarlo: Ver especificacion
     \State // Hippificar al estudiante
-    \If {$as.estAHippie?(pos)$}
-      \State $as.hippificar(pos)$ \complejidad{O(long(nombre))}
+    \If {$as.estAHippie?(as,pos,as.campusEstatico.vecinos(as,pos))$}
+      \State $as.hippificar(as,pos)$ \complejidad{O(long(nombre))}
     \EndIf
     \\
     \\
     %%%% Convertir a los hippies que quedaron encerrados por 4 estudiantes o eliminar a los que quedaron atrapados por agentes
     %%%% Funciona bien porque los vecinos de una posicion no son vecinos entre ellos
-    \State // Convertir a los hippies que quedaron encerrados por 4 estudiantes o eliminar a los que quedaron atrapados por agentes
-    \State $as.aplicarHippiesVecinos(pos)$ \complejidad{O(long(nombre))}
+    \State // Convertir a los hippies vecinos que quedaron encerrados por 4 estudiantes o eliminar a los que quedaron atrapados por agentes
+    \State $as.aplicarHippiesVecinos(as,pos)$ \complejidad{O(long(nombre))}
 
     %%%% aplicarHippiesVecinos
     %\State $vecinos \larr as.obtenerVecinos(pos)$ \complejidad{O(1)}
@@ -327,7 +324,6 @@ $(\forall p:paquete,paqueteEnTransito?(dc,p)) caminoRecorrido(dc,p)=$*$(caminoRe
 
     \\
     %%%% TODO: Si hay hippie: Capturar hippie en pos actual
-    %%%%       Sino: agregar el estudiante al diccionario
     \If {$as.campus[pos.x][pos.y].hayHippie?$} 
         \State $capturarHippie(pos)$ \complejidad{O(long(nombre))}
     \EndIf
@@ -338,35 +334,102 @@ $(\forall p:paquete,paqueteEnTransito?(dc,p)) caminoRecorrido(dc,p)=$*$(caminoRe
 \subsection{Algoritmos operaciones auxiliares}
  \algoritmo{sancionarAgentesVecinos}{in/out as:as, in pos:pos}{}{
     % Sancionar VECINOS
-    \State $vecinos \larr as.campusEstatico.obtenerVecinos(pos)$ \complejidad{O(1)}
+    \State $vecinos \larr as.campusEstatico.vecinos(pos)$ \complejidad{O(1)}
     \State $//$ La cantidad de vecinos es como maximo 4
     \If {$as.atrapadoPorAgente?(pos, vecinos)$} 
        \While {$i < vecinos.tamanio()$}  \complejidad{O(1)}
            \If {$as.campus[vecinos[i].x][vecinos[i].y].hayAgente?$}
-               \State $as.sancionarAgente(vecinos[i].agente.siguiente)$ \complejidad{O(1)}
+               \State $as.sancionarAgente(vecinos[i].agente)$ \complejidad{O(1)}
            \EndIf
            \State $i++$
        \EndWhile
     \EndIf
  }{O(1)}
 
- \algoritmo{atrapadoPorAgente?}{in pos:pos, in vecinos:arreglo(pos)}{res:bool}{
+\algoritmo{sancionarAgente}{in/out as:as, in/out agente:itDiccRapido}{}{
+    \State // Tengo como maximo 4 sanciones
+    \State $agente.siguiente.cantSanciones$ $\larr$ $agente.siguiente.cantSanciones + cantEstAtrapados(agente.siguiente.pos,as.campusEstatico.vecinos(agente.siguiente.pos))$ \complejidad{O(1)}
+    \State $agente.siguiente.miUbicacion.eliminarSiguiente()$ \complejidad{O(1)}
+    \State // El iterador mismas apunta a la posicion correspondiente del agente dentro de la lista ordenada por cantSanciones
+    \State // Como la lista en el peor caso puede contener a todos los agentes con igual cant de sanciones
+    \State // la mayor cantidad posible de iteraciones del ciclo es 4
+    \While {$agente.siguiente.mismas.haySiguiente() \land agente.siguiente.mismas.siguiente.cantSanciones < agente.siguiente.cantSanciones$}
+      \State $agente.siguiente.mismas.avanzar()$ \complejidad{O(1)}
+    \EndWhile
+    \State // Si no hay siguiente o  si la cantidad de sanciones del siguiente es menor que la del agente, entonces, 
+    \State // creo un conMismasBucket, lo inserto como siguiente y me guardo el iterador en miUbicacion
+    \State // Sino, agrego el agente al conj de agentes del siguiente y me guardo el iterador en miUbicacion
+    \If {$\neg(agente.siguiente.mismas.haySiguiente) \lor (agente.siguiente.mismas.haySiguiente \land agente.siguiente.cantSanciones=agente.siguiente.mismas.cantSanciones)$} \complejidad{O(1)}
+      \State $nConMismasB \larr nuevaTupla(agentes:Nuevo(), agente.siguiente.cantSanciones)$
+      \State $agente.siguiente.mismas \larr agente.siguiente.mismas.agregarComoSiguiente(nConMismasB)$ \complejidad{O(1)}
+      \State $agente.siguiente.miUbicacion \larr agente.siguiente.mismas.siguiente.agentes.agregarComoSiguiente(agente.siguiente.pl)$ \complejidad{O(1)}
+    \Else 
+      \State $agente.siguiente.mismas.siguiente.agentes.agregarComoSiguiente(agente.siguiente.pl)$ \complejidad{O(1)}
+    \EndIf
+}
+
+ \algoritmo{atrapadoPorAgente?}{in as:as, in pos:pos, in vecinos:arreglo(pos)}{res:bool}{
     \State $alMenos1Agente \larr False$ \complejidad{O(1)}
     \State $i \larr 0$
-    \While {$i<vecinos.tamanio()$} \complejidad{O(1)}
+    \If {$\neg(encerrado?(pos, as.campusEstatico.vecinos(pos)))$}
+      \State $return$ $false$
+    \EndIf
+    \State // Veo si hay algun agente alrededor
+     \While {$i<vecinos.tamanio()$} \complejidad{O(1)}
        \If {$as.campus[vecinos[i].x][vecinos[i].y].hayAgente?$}
-          \State $alMenos1Agente$ $\larr$ $True$
-          \State $i \larr vecinos.tamanio()$
+          \State $return$ $true$
         \EndIf
+        \State $i++$ \complejidad{O(1)}
+    \EndWhile
+ }{O(1)}
 
-        \If {$(as.campus[vecinos[i].x][vecinos[i].y].hayAgente?$ $\lor$
-             $as.campus[vecinos[i].x][vecinos[i].y].hayEst?$ $\lor$
-             $as.campus[vecinos[i].x][vecinos[i].y].hayHippie?$ $\lor$
-             $as.campus[vecinos[i].x][vecinos[i].y].hayHippie?)$}
+\algoritmo{hippificar}{in as:as, in pos:pos}{}{
+    \State // PRE: La posicion esta en el tablero y hay estudiante en la posicion
+    \State $as.campus[pos.x][pos.y].hayHippie \larr True$ \complejidad{O(1)}
+    \State $as.campus[pos.x][pos.y].hippie.agregarComoSiguiente(nombre, pos)$ \complejidad{O(long(nombreEstudiante))}
+    \State $as.campus[pos.x][pos.y].hayEst \larr False$ \complejidad{O(1)}
+    \State $as.campus[pos.x][pos.y].estudiante.eliminarSiguiente()$ \complejidad{O(long(nombreEstudiante))}
+}{}
+
+ \algoritmo{estAHippie?}{in as:as, in pos:pos, in vecinos:arreglo(pos)}{res:bool}{
+    \If {$\neg(encerrado?(pos,vecinos))$}
+      \State $return$ $false$ \complejidad{O(1)}
+    \EndIf
+    \State $i$ $\larr$ $0$ \complejidad{O(1)}
+    \State $cantHippies$ $\larr$ $0$
+    \While {$i < vecinos.tamanio()$}
+      \If {$campus[vecinos[i].x][vecinos[i].y].hayHippie$}
+        \State $cantHippies++$ \complejidad{O(1)}
+      \EndIf
+      \State $i++$
+    \EndWhile
+    \State $return$ $cantHippies \ge 2$ \complejidad{O(1)}
+ }{}
+
+ \algoritmo{encerrado?}{in as:as, in pos:pos, in vecinos:conj(pos)}{}{
+    \While {$i<vecinos.tamanio()$} \complejidad{O(1)}
+       \If {$\neg(as.campus[vecinos[i].x][vecinos[i].y].hayAgente?$ $\lor$
+             \\$as.campus[vecinos[i].x][vecinos[i].y].hayEst?$ $\lor$
+             \\$as.campus[vecinos[i].x][vecinos[i].y].hayHippie?$ $\lor$
+             \\$as.campus[vecinos[i].x][vecinos[i].y].hayObst?)$} \complejidad{O(1)}
               \State $return$ $false$ \complejidad{O(1)}
         \EndIf
-        \State $i++$
+        \State $i++$ \complejidad{O(1)}
     \EndWhile
+    \State $return true$
+ }{}
 
-    \State $res$ $\larr$ $alMenos1Agente$
- }{O(1)}
+ \algoritmo{aplicarHippiesVecinos}{in/out as:as, in pos:pos}{}{
+    \State $vecinos \larr as.campusEstatico.vecinos(pos)$ \complejidad{O(1)}
+    \While {$vecinos.haySiguiente$}
+       \If {$as.campus[vecinos.siguiente.x][vecinos.siguiente.y].hayHippie$}
+          \If {$as.hippieAEst(vecinos.siguiente)$} \complejidad{O(1)}
+              \State $as.campus[vecinos.siguiente.x][vecinos.siguiente.y].hayHippie \larr False$ \complejidad{O(1)}
+              \State $as.campus[vecinos.siguiente.x][vecinos.siguiente.y].hayEst \larr True$ \complejidad{O(1)}
+              \State $as.campus[vecinos.siguiente.x][vecinos.siguiente.y].hippie \larr CrearIt(as.hippies)$ \complejidad{O(1)}
+              \State $as.campus[vecinos.siguiente.x][vecinos.siguiente.y].hippie.agregarComoSiguiente(as.campus[vecinos.siguiente.x][vecinos.siguiente.y].estudiante.nombre)$ \complejidad{O(long(nombre))}
+              \State $as.campus[vecinos.siguiente.x][vecinos.siguiente.y].estudiante.eliminarSiguiente()$ \complejidad{O(long(nombre))}
+          \EndIf
+        \EndIf
+    \EndWhile
+ }{}
