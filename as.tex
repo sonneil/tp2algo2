@@ -359,17 +359,22 @@ $(\forall p:paquete,paqueteEnTransito?(dc,p)) caminoRecorrido(dc,p)=$*$(caminoRe
  \algoritmo{moverEstudiante}{in/out as:as, in nombre:String, in dir:direccion}{}{
     \State // PRE: El nombre es una clave del dicc de estudiantes, se retira o (La prox posicion es valida y no esta ocupada)
     \\
-    \State // Mover el estudiante
     \State $posVieja \larr as.estudiantes.obtener(nombre)$ \complejidad{O(long(nombre))}
-    \State $as.campus[posVieja.x][posVieja.y].hayEst? \larr False$
-    \State $as.campus[as.campusEstatico.proxPos(posVieja, dir).x][as.campusEstatico.proxPos(posVieja, dir).y].hayEst \larr True$
-    \State $as.campus[as.campusEstatico.proxPos(posVieja, dir).x][as.campusEstatico.proxPos(posVieja, dir).y].estudiante \larr as.campus[posVieja.x][posVieja.y].estudiante$ \complejidad{O(1)}
-    \State $as.campus[posVieja.x][posVieja.y].estudiante \larr NULL$ \complejidad{O(1)}
-    \State // Sancionar agentes vecinos y a los que encierran a est vecinos
-    \State  sancionarAgentesENcerrandoEstVecinos(as, pos) \complejidad{O(1)}
-    \State sancionarAgentesVecinos(as,pos) \complejidad{O(1)}
-    \State // Convertir a estudiantes los hippies vecinos o capturarlos
-    \State aplicarHippiesVecinos(as,pos) \complejidad{O(1)}
+    \If {$\neg(as.campusEstatico.seRetira(as.campus,dir,posVieja))$}
+        \State // Mover el estudiante
+        \State $as.campus[posVieja.x][posVieja.y].hayEst? \larr False$
+        \State $as.campus[as.campusEstatico.proxPos(posVieja, dir).x][as.campusEstatico.proxPos(posVieja, dir).y].hayEst \larr True$
+        \State $as.campus[as.campusEstatico.proxPos(posVieja, dir).x][as.campusEstatico.proxPos(posVieja, dir).y].estudiante \larr as.campus[posVieja.x][posVieja.y].estudiante$ \complejidad{O(1)}
+        \State $as.campus[posVieja.x][posVieja.y].estudiante \larr NULL$ \complejidad{O(1)}
+        \State // Sancionar agentes vecinos y a los que encierran a est vecinos
+        \State  sancionarAgentesENcerrandoEstVecinos(as, pos) \complejidad{O(1)}
+        \State sancionarAgentesVecinos(as,pos) \complejidad{O(1)}
+        \State // Convertir a estudiantes los hippies vecinos o capturarlos
+        \State aplicarHippiesVecinos(as,pos) \complejidad{O(1)}
+    \Else
+        \State $as.campus[posVieja.x][posVieja.y].hayEst? \larr False$ \complejidad{O(1)}
+        \State $as.campus[posVieja.x][posVieja.y].estudiante.eliminarSiguiente$ \complejidad{O(long(nombre))}
+    \EndIf
   }{O(long(nombre))}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

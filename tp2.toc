@@ -8,7 +8,7 @@
 \contentsline {section}{\numberline {2}Diccionario Rapido}{12}{section.2}
 \contentsline {subsection}{\numberline {2.1}Interfaz}{12}{subsection.2.1}
 \contentsline {subsection}{\numberline {2.2}Representaci\'on}{13}{subsection.2.2}
-\contentsline {subsection}{\numberline {2.3}Algoritmos}{13}{subsection.2.3}
+\contentsline {subsection}{\numberline {2.3}Algoritmos}{14}{subsection.2.3}
 \contentsline {subsection}{\numberline {2.4}Servicios Usados}{14}{subsection.2.4}
 \contentsline {section}{\numberline {3}Diccionario por nombres}{14}{section.3}
 \contentsline {subsection}{\numberline {3.1}Interfaz}{14}{subsection.3.1}
