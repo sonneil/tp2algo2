@@ -309,6 +309,52 @@ $(\forall p:paquete,paqueteEnTransito?(dc,p)) caminoRecorrido(dc,p)=$*$(caminoRe
         \State $capturarHippie(pos)$ \complejidad{O(long(nombre))}
     \EndIf
  }{O(long(nombre))}
+ 
+  \algoritmo{ComenzarRastrillaje}{in/out as:as, in ce:CampusEstatico, Agentes:dicc(placa pos)}{}{
+
+  \State $as.CampusEstatico \larr ce$ \complejidad{O(1)}
+  \State $ItAgentes \larr CrearItAgentes(Agentes)$ \complejidad{O(1)}
+  \State $i \larr 0$ \complejidad{O(1)}
+  \State $j \larr 0$ \complejidad{O(1)}
+  
+  \While {$i < ce.Ancho $} \complejidad{O(Ancho)}
+    \While {$j < ce.Alto $} \complejidad{O(Alto)}
+      \State $as.Campus[i][j].HayHippie \larr False$\complejidad{O(1)}
+      \State $as.Campus[i][j].HayEst \larr False$\complejidad{O(1)}
+      \State $as.Campus[i][j].HayObst \larr ce.Obstaculos[i][j]$\complejidad{O(1)}
+      \State $i \larr i+1$\complejidad{O(1)}
+      \State $j \larr j+1$\complejidad{O(1)}
+    \EndWhile
+  \EndWhile
+
+  \State $as.Agentes \larr CrearDiccSuperRapido()$\complejidad{O(1)}
+  \State $MayorPlaca \larr 0$\complejidad{O(1)}
+  \While {$ItAgente.HaySiguiente$}\complejidad{O(Cantidad Agentes)}
+      \State $as.Campus[ItAgentes.Siguiente.pos.X][ItAgentes.Siguiente.pos.Y].HayAgente \larr True$\complejidad{O(1)}
+      \State $as.Campus[ItAgentes.Siguiente.pos.X][ItAgentes.Siguiente.pos.Y].Pl \larr $\\$ Definir(as.Agentes, ItAgentes.Siguiente.Pl, 
+      %%%%%%%%%%%%% No se como es el tema de tupla cuando es un Definir %%%%%%%%%%%%
+      Tupla(Pos \larr ItAgentes.Siguiente.Pos, CantSanciones \larr 0, CantCapturas \larr 0)$\complejidad{O(1)}
+      
+      \If{$MayorPlaca < ItAgentes.Siguientes.Pl$}
+        \State $MayorPlaca \larr ItAgenda.Siguiente.Pl$\complejidad{O(1)}
+        \State $MayorAgente \larr ItAgenda.Siguiente$\complejidad{O(1)}
+    \EndIf
+    \State $ItAgentes.Avanzar$\complejidad{O(1)}
+  \EndWhile
+  
+  \State $as.Estudiante \larr CrearDiccPorNombre()$\complejidad{O(1)}
+  \State $as.Hippie \larr CrearDiccPorNombre()$\complejidad{O(1)}
+  \State $as.MasVigilante \larr MayorAgente$\complejidad{O(1)}
+  \State $as.PorSanciones \larr CrearLista(Tupla<Agentes \larr \varnothing, \#Sanciones \larr 0>$\complejidad{O(1)}
+  \State $ItAgentesRapido \larr CrearItAgentesRapido()$ \complejidad{O(1)}
+  
+  \While{$ItAgentesRapido.HaySiguiente$}\complejidad{O(Cantidad Agentes)}
+    \State $ItAgentesRapido.HaySiguiente.MiHubicacion \larr $\\$ as.PorSancion.ObtenerUltimo.Agentes.Agregar(ItAgentesRapido,SiguienteClave)$\complejidad{O(1)}
+    \State $ItAgentesRapido.Avanzar$\complejidad{O(1)}
+  \EndWhile
+    
+
+ }{O((Ancho*Alto) + N_a)}
 
  \algoritmo{moverEstudiante}{in/out as:as, in nombre:String, in dir:direccion}{}{
     \State // PRE: El nombre es una clave del dicc de estudiantes, se retira o (La prox posicion es valida y no esta ocupada)
@@ -444,27 +490,24 @@ $(\forall p:paquete,paqueteEnTransito?(dc,p)) caminoRecorrido(dc,p)=$*$(caminoRe
     \State $vecinos \larr as.campusEstatico.vecinos(pos)$ \complejidad{O(1)}
     \State $i \larr 0$ \complejidad{O(1)}
     \While {$i < vecinos.tamanio()$} \complejidad{O(long(nombre))}
-       \If {$as.campus[vecinos[i].x][vecinos[i].y].hayHippie$}
-          \If {$as.hippieAEst(vecinos.siguiente)$} \complejidad{O(1)}
-              \State $as.campus[vecinos[i].x][vecinos[i].y].hayHippie \larr False$ \complejidad{O(1)}
-              \State $as.campus[vecinos[i].x][vecinos[i].y].hayEst \larr True$ \complejidad{O(1)}
-              \State $as.campus[vecinos[i].x][vecinos[i].y].hippie \larr CrearIt(as.hippies)$ \complejidad{O(1)}
-              \State $as.campus[vecinos[i].x][vecinos[i].y].hippie.agregarComoSiguiente(as.campus[vecinos[i].x][vecinos[i].y].estudiante.nombre)$ \complejidad{O(long(nombre))}
-              \State $as.campus[vecinos[i].x][vecinos[i].y].estudiante.eliminarSiguiente()$ \complejidad{O(long(nombre))}
-          \Else
-            \If {$as.campus[vecinos[i].x][vecinos[i].y].hayHippie?$ $\land$ $atrapadoPorAgente(vecinos[i])$}
-                \State $as.campus[vecinos[i].x][vecinos[i].y].hayHippie? = False$ \complejidad{O(1)}
-                \State $as.campus[vecinos[i].x][vecinos[i].y].hippie.eliminarSiguiente()$ \complejidad{O(long(nombre))}
-            \EndIf
-          \EndIf
-        \EndIf
+       \State aplicarHippie(as, pos) \complejidad{O(long(nombre))}
     \EndWhile
  }{O(long(nombre))}
 
- \algoritmo{capturarHippie}{in/out as:as, in pos:pos}{}{
+ \algoritmo{aplicarHippie}{in/out as:as, in pos:pos}{}{
     \State // PRE: pos valida y hayHippie en as.campus[pos.x][pos.y]
-    \If {$atrapadoPorAgente?(as, pos, as.campusEstatico.vecinos(pos))$}
-        \State $as.campus[pos.x][pos.y].hippie.eliminarSiguiente()$ \complejidad{O(1)}
-        \State $as.campus[pos.x][pos.y].hayHippie \larr False$ \complejidad{O(1)}
+    \If {$as.campus[pos.x][pos.y].hayHippie$}
+      \If {$as.hippieAEst(pos)$} \complejidad{O(1)}
+          \State $as.campus[pos.x][pos.y].hayHippie \larr False$ \complejidad{O(1)}
+          \State $as.campus[pos.x][pos.y].hayEst \larr True$ \complejidad{O(1)}
+          \State $as.campus[pos.x][pos.y].hippie \larr CrearIt(as.hippies)$ \complejidad{O(1)}
+          \State $as.campus[pos.x][pos.y].hippie.agregarComoSiguiente(as.campus[pos.x][pos.y].estudiante.nombre)$ \complejidad{O(long(nombre))}
+          \State $as.campus[pos.x][pos.y].estudiante.eliminarSiguiente()$ \complejidad{O(long(nombre))}
+      \Else
+        \If {$as.campus[pos.x][pos.y].hayHippie?$ $\land$ $atrapadoPorAgente(pos)$}
+            \State $as.campus[pos.x][pos.y].hayHippie? = False$ \complejidad{O(1)}
+            \State $as.campus[pos.x][pos.y].hippie.eliminarSiguiente()$ \complejidad{O(long(nombre))}
+        \EndIf
+      \EndIf
     \EndIf
- }{O(1)}
+ }{O(long(nombre))}
