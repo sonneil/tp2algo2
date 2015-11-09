@@ -101,8 +101,7 @@ $k$ : la cola de paquetes más larga de todas las computadoras.
 
 \serc{estr}{
 	\\
-	\donde{estr}{\tupla{ ancho: nat, alto: nat, 
-	   grilla: \mbox {arreglo(arreglo(\tupla{Ocupado: bool, EsObst: bool, EsAgente: bool}, \tupla{pl:nat, nombre:string}))}}
+	\donde{estr}{\tupla{ ancho: nat, alto: nat,	grilla: \mbox {arreglo(arreglo(\tupla{Ocupado: bool, EsObst: bool, EsAgente: bool, HiippieoEst:\tupla{pl:nat, nombre:string} }))}}
   }	
 }
 
@@ -174,72 +173,97 @@ $(\forall p:paquete,paqueteEnTransito?(dc,p)) caminoRecorrido(dc,p)=$*$(caminoRe
 
 \subsection{Algoritmos}
 
-\algoritmo{icrearSistema}{in r:red}{res:dcnet}{
+\algoritmo{iArmarCampus}{in ancho:nat, in alto:nat}{res:campus}{
 %inicializacion Caminos Minimos
-	\State $res.red \larr r$
-	\State $n \larr Longitud(\Fun{compus}(red))$ \complejidad{O(1)}
-	\State $i\larr 0$
-	\State $j\larr 0$
-		\complejidad{O(1)}
-	\State $res.Compus \larr \Fun{CrearArreglo}(n)$
-		\complejidad{O(n)}
-	\State $res.CaminosMinimos\larr \Fun{CrearArreglo}(n)$
-		\complejidad{O(n)}
-	\Var{p: arreglo$\_$dimensionable de puntero(conjLog(paquete))}	
-	\While{i$<$n} \complejidad{O($L*n^5$)}
-		\complejidad{O(n)}
-		\State $res.CaminosMinimos[i] \larr \Fun{CrearArreglo}(n)$ 
-			\complejidad{O(n)}
-		\State s:$ \ <nat,conjLog(paquete,<_{id}),conjLog(paquete,<_{p}), $\\$ conjLog(paquetePos,<_{id}),conjLog(paquetePos,<_{p}) >$
-		%HAY que ver bien donde definir la relacion!!
-		\State $\pi_1(s) \larr compu(r,i)$
-		\State $\pi_2(s) \larr \Fun{nuevo}()$
-		\State $\pi_3(s) \larr \Fun{nuevo}()$
-		\State $\pi_4(s) \larr \Fun{nuevo}()$
-		\State $\pi_5(s) \larr \Fun{nuevo}()$
-		\State \Fun{definir}(res.CompusPorPref,compu(r,i),s)
-			\complejidad{O(L)}
-		\State $p[i] \larr \pi_3(s)$
-		\State $p'[i] \larr \pi_5(s) $
-		\State $res.Compus[i] \larr $ $<compu(r,i),p[i],p'[i],0>$ 
+	\State $res.ancho \larr ancho$ \complejidad {O(1)}
+	\State $res.alto \larr alto$ \complejidad {O(1)}
+	\State $res.grilla \larr CrearArreglo(ancho)$ \complejidad{O(an)}
+	\State $i\larr 0$ \complejidad {O(1)}
 			\complejidad{O(1)}
-		\While{j$<$n} \complejidad{O($L*n^4$)}
-			\complejidad{O(n)}
-			\State $res.CaminosMinimos[i][j] \larr caminoMinimo(compu(r,i),compu(r,j),r)$
-				\complejidad{O($L*n^3$)}
-			\State $j++$
+	\While{$i<ancho$} \complejidad{O($al*an$)}
+		\complejidad{O(an)}
+		\State $res.grilla[i] \larr \Fun{CrearArreglo}(alto)$ 
+			\complejidad{O(al)}
+		\State $j \larr 0$ \complejidad {O(1)}
+		\While {$j<alto$} \complejidad {O (al)}
+			\State $res.grilla [i][j] \larr <False,False,False,<0,"">>$ \complejidad {O(1)}
 		\EndWhile
-		\State $i++$	
 	\EndWhile
-	\State $res.LaQMasEnvio \larr 0$
-		\complejidad{O(1)}
+	
 %holi
 }
-{O($L \times n^5$)}
+{O($an*al$)}
 
-\algoritmo{icrearPaquete}{in/out s:dcnet,in/out p: paquete}{}{ %hay que cambiar nombres segun heap y avl
-  \State $t_1:\ <nat,conjLog(paquete,<_{id}),conjLog(paquete,<_{p}), $\\$ conjLog(paquetePos,<_{id}),conjLog(paquetePos,<_{p}) >$
-  \State $t_1 \larr \Fun{Obtener}(origen(p),\ \var{s}.CompusPorPref)$
-        \complejidad{O($L$)}
-  \State $t_2:\ <nat,conjLog(paquete,<_{id}),conjLog(paquete,<_{p}), $\\$ conjLog(paquetePos,<_{id}),conjLog(paquetePos,<_{p}) >$
-  \State $t_2 \larr \Fun{Obtener}(destino(p),\ \var{s}.CompusPorPref)$
-  	\complejidad{O($L$)}
-  \State $p$'$:paquetePos$ 
-  \State $\Fun{indiceOrigen}(p$'$) \larr \pi_1(t_1)$
-  	\complejidad{O(1)}
-  \State $\Fun{indiceDestino}(p$'$) \larr \pi_1(t_2)$
-  	\complejidad{O(1)}
-  \State $\Fun{posActual}(p$'$) \larr 0$
-  \State \Fun{insertar}($\pi_2(t),p$) %agrega segun nombre
-        \complejidad{O($log(k)$)}
-  \State \Fun{insertar}($\pi_3(t),p$) %agrega segun prioridad
-        \complejidad{O($log(k)$)}
-  \State \Fun{insertar}($\pi_4(t),p$') %agrega segun nombre
-        \complejidad{O($log(k)$)}
-  \State \Fun{insertar}($\pi_5(t),p$') %agrega segun prioridad
-        \complejidad{O($log(k)$)}
+\algoritmo{iAgregarObs}{in/out c:campus,in p: pos}{}{ %hay que cambiar nombres segun heap y avl
+  \State $\pi_1(c.grilla[p.X][p.Y]) \larr True$
+  	\complejidad {O(1)}
+  \State $\pi_2(c.grilla[p.X][p.Y]) \larr True$ \complejidad {O(1)}
 }
-{O($L + log(k)$)}
+{O(1)}
+\algoritmo{iAlto}{in c:campus}{res:nat}{
+	\State $res \larr c.alto$ \complejidad {O(1)}
+}
+{O(1)}
+\algoritmo{iAncho}{in c:campus}{res:nat}{
+	\State $res \larr c.ancho$ \complejidad {O(1)}
+}
+{O(1)}
+\algoritmo{iOcupada}{in c:campus, in p:pos}{res:bool}{
+	\State $res \larr c.grilla[p.X][p.Y].Ocupado$\complejidad {O(1)}
+}
+{O(1)}
+\algoritmo{iPosValida}{in c:campus, in p:pos}{res:bool}{
+	\State $res \larr p.X<c.ancho \land p.Y<c.alto$  \complejidad {O(1)}
+}
+{O(1)}
+\algoritmo{iEsIngreso}{in c:campus, in p:pos}{res:bool}{
+	\State $res \larr Y.p==0 \lor Y.p==c.alto-1 $\complejidad {O(1)}
+}
+{O(1)}
+\algoritmo{iIngresoSup}{in c:campus, in p:pos}{res:bool}{
+	\State $res \larr Y.p==0$\complejidad {O(1)}
+}
+{O(1)}
+\algoritmo{iIngresoInf}{in c:campus, in p:pos}{res:bool}{
+	\State $res \larr Y.p==c.alto-1$\complejidad {O(1)}
+}
+{O(1)}
+\algoritmo{iDistancia}{in c:campus, in p1:pos,p2:pos}{res:nat}{
+	\State $resX \larr 0$
+	\State $resY \larr 0$
+	\If{$p1.X<p2.X$}
+		\State $resX \larr p2.X-p1.X$
+	\Else
+		\State $resX \larr p1.X-p2.X$
+	\Endif
+	\If{$p1.Y<p2.Y$}
+		\State $resY \larr p2.Y-p1.Y$
+	\Else
+		\State $resy \larr p1.Y-p2.Y$
+	\Endif
+	\State $res \larr resX+resY$
+}
+{O(1)}
+\algoritmo{iVecinos}{in c:campus, p:pos}{res:conj(pos)}{
+	\State $pn \larr <p.X,p.Y+1>$
+	\IF {$PosValida(c,pn)$}
+		\State agregar(res,pn)
+	\Endif
+	\State $pn \larr <p.X,p.Y-1>$
+	\IF {$PosValida(c,pn)$}
+		\State agregar(res,pn)
+	\Endif
+	\State $pn \larr <p.X+1,p.Y>$
+	\IF {$PosValida(c,pn)$}
+		\State agregar(res,pn)
+	\Endif
+	\State $pn \larr <p.X-1,p.Y>$
+	\IF {$PosValida(c,pn)$}
+		\State agregar(res,pn)
+	\Endif
+	
+}
+{O(1)}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
