@@ -108,50 +108,12 @@ $k$ : la cola de paquetes más larga de todas las computadoras.
 \subsubsection*{Invariante de representación}
 
 \begin{enumerate}
-  \item Todos los IP de \textit{compus} pertenecen al conjunto de claves de \textit{CompusPorPref} y la longitud de dicho arreglo 
-		es igual al cardinal de las claves del diccionario. 
-  \item Los pN de las tuplas que tiene el arreglo \textit{compus} apuntan al conjunto de paquetes(PorNom) 
-		de un significado en \textit{CompusPorPref} cuya clave es igual al IP de esa posición en el arreglo.
-  \item Los pN' apuntan al conjuno de paquetes(porNom') de un significado en \textit{CompusPorPref} cuya clave es igual al IP 
-		de esa posición en el arreglo
-  \item Los paquetes del significado pN' son iguales a los paquetes de pN
-  \item El origen de pN' es distinto al destino de pN' y ambos son posiciones válidas del arreglo compus
-  \item PosActual de pN' es una posicion válida del arreglo compus
-  \item La $\#PaquetesEnviados$ de cada compu es mayor o igual a la actual cantidad total de paquetes que pasaron por esa compu
-  \item Todos los conjuntos de los significados de \textit{CompusPorPref} son disjuntos dos a dos.
-  \item Los conjuntos de los campos de la tupla PorNom, PorPrior son iguales.
-  \item La matriz de caminosMinimos es cuadrada de lado n, con n igual al tamaño del arreglo de compus.
-  \item Para cualquier compu en el sistema f,d caminosMinimos[f][d] se corresponde con caminoMinimo(red,f,d)
-  \item La longitud de \textit{CaminosMinimos} es igual a la longitud del arreglo que tiene \textit{CaminosMinimos} en cada posición.
-  \item La longitud del arreglo, que tiene un arreglo de \textit{CaminosMinimos} es menor o igual a la longitud de \textit{CaminosMinimos}.
-  \item Los elementos del arreglo anteriormente mencionado son IPs del diccionario \textit{CompusPorPref} y no tiene repetidos.
-  \item La computadora que más paquetes envió es aquella cuyo índice es igual a \textit{LaQMasEnvio}
-\end{enumerate}
+  \item  El tamaño de todos los arreglos internos de la grilla es el mismo e igual al alto del campus
+  \item El tamaño del arreglo principal de la grilla es igual al ancho del campus
+  
 
-\rep{sistema}{s}  \\
- $1.\ \paratodo{String}{s}\ \fun{$def?$}(s, s.CompusPorPref), (\exists c : compu), \fun{$esta?$}(c,s.Compus)\ \land\ \pi_1(c) = s\ \land\ \fun{longitud}(s.Compus) = \#\Fun{claves}(s.CompusPorPref)$\\
- $2.\ \paratodo{compu}{c}\ \fun{esta?}(c, s.Compus), *\pi_2(c) = \fun{obtener}(\pi_1(c),s.CompusPorPref) $\\
- $3.\ \paratodo{compu}{c}\ \fun{esta?}(c, s.Compus), *\pi_3(c) = \fun{obtener}(\pi_3(c),s.CompusPorPref) $\\
- $4,5,6.$ \\$\ (\paratodo{nat}{c})\ 0 \le c < Longitud(s.compus) \impluego$\\
-  \indent $\ \ Longitud(s.compus[c].pN) = Longitud(s.compus[c].pN')$ $\land$ \\
-  \indent $\ \ (\paratodo{paquetePos}{p}) \fun{esta?}(p,s.compus[c].pN') \impluego$\\
-  \indent \indent \indent $\ \ \ \ \fun{esta}(\pi_1(p), s.compus[c].pN)$ $\land$ $0 \le indiceOrigen(p) < Longitud(s.compus)$\\
-  \indent \indent \indent $\ \ \ \ \land$ $0 \le indiceDestino(p) < Longitud(s.compus)$\\
-  \indent \indent \indent $\ \ \ \ \land$ $\ 0 \le posActual(p) < Longitud(s.compus)$\\
-  \indent \indent \indent $\ \ \ \ \land$ $\ \neg(indiceDestino(p)=indiceOrigen(p))$\\
- $7.\ \ (\paratodo{nat}{c})$ $0 \le c < Longitud(s.compus)$ $\impluego$\\
- \indent \indent $\ \ (\paratodo{paquetePos}{p})$ $\fun{pertenece}(s.compus[c].pN', p)$ $\impluego$\\
- \indent \indent \indent $\ \ \ \ \beta(\fun{esta}(s.compus[c],caminoMinimo(s.red,s.compus[indiceOrigen(p)],s.compus[posActual(p)])))$\\
- $8.\ \ \paratodo{String}{s,t}\ \fun{def?}(s, s.CompusPorPref)\ \land\ \fun{def?}(t, s.CompusPorPref)\ \land\ s \neq t \impluego \\ \fun{obtener}(s, s.CompusPorPref)\ \bigcap\ \fun{obtener}(t, s.CompusPorPref) = \emptyset$\\
- $9.\ \paratodo{String}{s}\ \fun{def?}(s, s.CompusPorPref)\ \impluego\ \pi_1(\fun{obtener}(s, s.CompusPorPref)) =\\ \pi_2(\fun{obtener}(s, s.CompusPorPref))$ \\
- $10.\ Longitud(s.compus) = Longitud(CaminosMinimos(s))$ $\land$\\
- \indent \indent \indent \indent$\ \ \ (\paratodo{nat}{i})$ $0 \le i < Longitud(s.compus)$ $\impluego$\\
- \indent \indent \indent \indent$\ \ \ \ \ Longitud(s.CaminosMinimos[i]) = Longitud(s.compus)$\\
- $11.\ (\paratodo{nat}{f,d})$ $\neg(f=d) \land$ $0 \le f,d < Longitud(s.compus)$ $\impluego$\\
- \indent \indent $\ \ \ CaminosMinimos[f][d]$ $=$\\
- \indent \indent $\ \ \ caminoMinimo(s.red,ipACompu(s.red,\pi_1(s.compus[f])),ipACompu(s.red,\pi_1(s.compus[d])))$\\
- $12,13,14.\ (\paratodo{nat}{i,j}),\ 0 \leq i,j < \fun{longitud}(s.CaminosMinimos) \impluego \fun{longitud}(s.CaminosMinimos) = \fun{longitud}(s.CaminosMinimos[i])\ \land\ \fun{longitud}(s.CaminosMinimos[i][j]) < \fun{longitud}(s.CaminosMinimos)\ \land\ (\paratodo{nat}{e}), \fun{esta?}(e, s.CaminosMinimos[i][j]) \Rightarrow \fun{pertenece}(e,s.CompusPorPref)  $\\
- $15. \paratodo{compu}{c}\ \fun{esta?}(c, s.Compus)\ \impluego\ \pi_3(c) \leq \pi_3(s.Compus[s.LaQMasEnvio])$
+\rep{campus}{}  \\
+ $|c.grilla|=c.ancho \land (\forall n:nat, n \in \lbrack 0, c.ancho)) |c.grilla [n]|=c.alto$
 %\subsubsection*{Función de abstracción}
  %\abs{sistema}{sist}{dcnet}{s} \\
 %$(\fun{s.} = \NULL \land \fun{*r.der} = \NULL \ssi nil?(a)) \ \oluego$ \\
@@ -164,10 +126,8 @@ $k$ : la cola de paquetes más larga de todas las computadoras.
 
 \subsubsection*{Funci\'on de abstracción}
 
-\abs{dcnet}{DCNet}{s}{dc} \\
-$red(dc)=$*$(s.red) \land (\forall c:compu, c\in compus(dc))( enEspera(dc,c)=$*$(enEspera(s,c)) \land$ \\
-$  cantidadEnviados(dc,c)=cantidadEnviados(s,c)) \land $ \\ 
-$(\forall p:paquete,paqueteEnTransito?(dc,p)) caminoRecorrido(dc,p)=$*$(caminoRecorrido(s,p)) $
+\abs{campus}{Campus}{c}{cE} \\
+$columnas(cE)=c.ancho \land filas(cE)=c.alto\land (\forall p:pos, PosValida?(cE,p)) Ocupada?(cE,p)=Ocupada?(c,p)$
 
 \newpage
 
@@ -245,6 +205,7 @@ $(\forall p:paquete,paqueteEnTransito?(dc,p)) caminoRecorrido(dc,p)=$*$(caminoRe
 }
 {O(1)}
 \algoritmo{iVecinos}{in c:campus, p:pos}{res:conj(pos)}{
+	\State $res \larr Vacio() $
 	\State $pn \larr <p.X,p.Y+1>$
 	\IF {$PosValida(c,pn)$}
 		\State agregar(res,pn)
