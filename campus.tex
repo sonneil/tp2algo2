@@ -84,8 +84,14 @@ $\textbf{usa}$
  \operacion{Vecinos}{in c: campus, p: pos}{res : conj(pos)}
  {$PosValida(c,p)$}
  {$\var{res} \equiv vecinos (p, c) $}
- {devuekve el conjunto de vecinos de una posición.}
+ {Devuelve el conjunto de vecinos de una posición.}
  {O(1)}
+ {}
+  \operacion{aPosMasCercana}{in c: campus, p: pos, con:conj(pos)}{res : pos}
+ {$PosValida(c,p)\land #con>0$}
+ {$(\forall p_1) PosValida(c, p_1) \impluego Distancia(c,p) \leq Distancia(c, p_1) $}
+ {Dado un conjunto de posiciones y una posiciones, da la más cercana a la posicion dada.}
+ {O($#con$)}
  {}
  
 Las complejidades están en función de las siguientes variables:\\
@@ -177,15 +183,15 @@ $columnas(cE)=c.ancho \land filas(cE)=c.alto\land (\forall p:pos, PosValida?(cE,
 }
 {O(1)}
 \algoritmo{iEsIngreso}{in c:campus, in p:pos}{res:bool}{
-	\State $res \larr Y.p==0 \lor Y.p==c.alto-1 $\complejidad {O(1)}
+	\State $res \larr Y.p=0 \lor Y.p=c.alto-1 $\complejidad {O(1)}
 }
 {O(1)}
 \algoritmo{iIngresoSup}{in c:campus, in p:pos}{res:bool}{
-	\State $res \larr Y.p==0$\complejidad {O(1)}
+	\State $res \larr Y.p=0$\complejidad {O(1)}
 }
 {O(1)}
 \algoritmo{iIngresoInf}{in c:campus, in p:pos}{res:bool}{
-	\State $res \larr Y.p==c.alto-1$\complejidad {O(1)}
+	\State $res \larr Y.p=c.alto-1$\complejidad {O(1)}
 }
 {O(1)}
 \algoritmo{iDistancia}{in c:campus, in p1:pos,p2:pos}{res:nat}{
@@ -222,6 +228,49 @@ $columnas(cE)=c.ancho \land filas(cE)=c.alto\land (\forall p:pos, PosValida?(cE,
 	\IF {$PosValida(c,pn)$}
 		\State agregar(res,pn)
 	\Endif
+	
+}
+{O(1)}
+\algoritmo{iaPosMasCercana}{in c:campus, in p:pos, con:conj(pos)}{res:pos}{
+	\State $it \larr CrearIt(con)$
+	\State $res \larr it$
+	\While{HaySiguiente?(it))}
+		\State Avanzar(it)
+		\If{$Distancia(c,p)>Distancia(c,it)$}
+			\State $EliminarAnterior(it)$
+			\State $res \larr it$
+		\Endif
+		\If{$Distancia(c,p)<Distancia(c,it)$}
+			\State $Retroceder(it)$
+			\State $EliminarSiguiente(it)$
+		\Endif
+	\Endwhile
+	\State $it \larr CrearIt(con)$
+	\State $res \larr it$
+	\While{HaySiguiente?(it))}
+		\State Avanzar(it)
+		\If{$Distancia(c,<0,0>)>Distancia(c,it)$}
+			\State $EliminarAnterior(it)$
+			\State $res \larr it$
+		\Endif
+		\If{$Distancia(c,<0,0>)<Distancia(c,it)$}
+			\State $Retroceder(it)$
+			\State $EliminarSiguiente(it)$
+		\Endif
+	\Endwhile
+	\State $it \larr CrearIt(con)$
+	\State $res \larr it$
+	\While{HaySiguiente?(it))}
+		\State Avanzar(it)
+		\If{$p.Y<it.Y$}
+			\State $EliminarAnterior(it)$
+			\State $res \larr it$
+		\Endif
+		\If{$p.Y>it.Y$}
+			\State $Retroceder(it)$
+			\State $EliminarSiguiente(it)$
+		\Endif
+	\Endwhile
 	
 }
 {O(1)}
