@@ -2,19 +2,19 @@
 
 \section{Diccionario Rapido}
 
-Es un diccionario que dado un numero de placa como clave, nos da su significado en promedio O(1)
+Es un diccionario que dado una clave nat distribuida uniformemente, nos da su significado en promedio O(1)
 
 \subsection{Interfaz}
 
   \textbf{par\'ametros formales}
   
-  \textbf{g\'eneros} Nat, $\alpha$\\
+  \textbf{g\'eneros} Nat, $\beta$\\
 
-\sexc{Diccionario(Nat,conj($\alpha$))}
-\generos{diccR(Nat,conj($\alpha$))}
+\sexc{Diccionario(Nat,conj($\beta$)), Iterador Bidireccional}
+\generos{diccR(Nat,conj($\beta$))}
 
 $\textbf{usa}$  
-Bool, Nat, Conjunto($\alpha$)
+Bool, Nat, Conjunto($\beta$)
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -22,99 +22,80 @@ Bool, Nat, Conjunto($\alpha$)
 \subsubsection*{Operaciones}
 
 
-\operacion{crear}{in n : nat}{res : diccR(Nat,\alpha)}
+\operacion{crear}{in dicc:Dicc(c:nat s:\beta)}{res : diccSR(Nat,\beta)}
  {true}
- {$\#Claves(res) \igobs n$}
+ {$res \igobs Nuevo()$}
  {Crea un diccionario rapido.}
  {O(n)}
- {Completar Aliasing}
+ {No hay aliasing}
 
-\operacion{asignar}{in/out v:diccR(Nat;conj($\alpha$)),in p:nat,in s:$\alpha$}{}
- {$v \igobs v_0$ $\land$ Definido?(p,v)}
- {$Definir(p , Ag(Obtener(p,v_0),s) , v)$}
- {Agrega el valor de s, al significado actual, para la clave dada}
- {O(1)}
- {Completar Aliasing}
-
-\operacion{dameS}{in/out v : diccR(Nat;conj(\alpha)),in p : nat}{res : conj($\alpha$)}
+\operacion{obtener}{in/out v : diccR(Nat;conj(\alpha)),in p : nat}{res : conj($\alpha$)}
  {Definido?(p,v)}
  {$Obtener(p,v)$}
  {Retorna el significado actual, para la clave dada.}
  {O(1)}
- {Completar Aliasing}
+ {El retorno se hace por referencia, hay aliasing entre el objeto devuelto y el del contenedor}
  
 Las complejidades est\'an en funci\'on de las siguientes variables:\\
-$n$ : la cantidad total de claves, definidas en el diccionario. \\
+$n$ : la cantidad total de claves definidas en el diccionario. \\
 \\ \\
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Representaci\'on}
 
-\serc{acceso}{
+\serc{estr}{
 	\\
-	\donde{acceso}{claves : arreglo(contenido)}
-	\\
-	\donde{contenido}{conjl($\alpha$}
+	\donde{estr}{\tupla{
+					accesoRapido : \mbox{vector(acceso:Dicc(nat,itDicc(nat,\beta)))},
+					contenedor : \mbox{Dicc(c:nat,s:\beta)}
+				}}
 }
-
-Aclaraci\'on: cada vez que dice arreglo en esta estructura nos referimos a arreglo\_estatico y conjl es conjunto lineal
+El contenedor esta implementado sobre Dicc lineal\\
+Cada posicion del vector esta implementado sobre Dicc lineal
 
 \subsubsection*{Invariante de representaci\'on}
-
 \begin{enumerate}
-  \item Todos los indices del arreglo, pertenecen al conjunto de claves del diccionario   
-		sin repetidos.
-  \item Para todos los indices i del arreglo, contenido es igual al significado del   
-		diccionario para ese i. 
+  \item El diccionario que resulta de Definir ordenadamente los siguientes de cada (clave, sign) del dicc de cada posicion del vector, es igual al contenedor
+  \item El tamaño del vector es igual al tamaño del contenedor
+  \item La suma de todos los tamanios de los dicc en vector es igual al tamaño del contenedor
 \end{enumerate}
 
-\rep{acceso}{a}  \\
-\begin{enumerate}
- \item 1. \paratodo{Nat}{p} Definido?(a,p) = obtener($\pi_1$(c),s.CompusPorPref)
-\end{enumerate}
-
-
-\subsubsection*{Funci\'on de abstracciÃ³n}
-
-\abs{dcnet}{DCNet}{s}{dc} \\
-$red(dc)=$*$(s.red) \land (\forall c:compu, c\in compus(dc))( enEspera(dc,c)=$*$(enEspera(s,c)) \land$ \\
-$  cantidadEnviados(dc,c)=cantidadEnviados(s,c)) \land $ \\ 
-$(\forall p:paquete,paqueteEnTransito?(dc,p)) caminoRecorrido(dc,p)=$*$(caminoRecorrido(s,p)) $
 
 \subsection{Algoritmos}
 
-\algoritmo{icrear}{in r : Nat}{res:diccR()}{
-%inicializacion Caminos Minimos
-	\State $i \larr 0$
-		\complejidad{O(1)}
-	\State $p \larr CrearArreglo(n)$ \complejidad{O(n)}
-	\While {$i<n$} \complejidad{O(n)}
-		\State $p[i] \larr vacio()$
-			\complejidad{O(1)}
-		\State $i++$	
-			\complejidad{O(1)}
+\algoritmo{iNuevo}{in diccACopiar:dicc(c:Nat, s:$\beta$)}{res:diccR()}{
+	\State $it \larr CrearIt(diccACopiar)$ \complejidad{O(1)}
+	\State // Inicializo el vector
+	\While {$it.haySiguiente$}
+		\State $res.accesoRapido.agregarAtras(NULL)$ \complejidad{O(1)}
+		\State $it.avanzar()$ \complejidad{O(1)}
 	\EndWhile
-	\State $res \larr p$
-		\complejidad{O(1)}
+	\State $it \larr CrearIt(diccACopiar)$ \complejidad{O(1)}
+	\State // El iterador vuelve a apuntar al primer elemento, defino todos los elementos del vector en el hash
+  	\While {$it.haySiguiente()$} \complejidad{O(diccACopiar.tamanio())}
+  		\State $res.accesoRapido[fHash(it.siguienteClave())].$
+  		\State   $Definir(c,res.contenedor.Definir(it.siguienteClave(),it.siguienteSignificado()))$ \complejidad{$\theta$(1)}
+  		\State $it.avanzar()$ \complejidad{O(1)}
+  	\EndWhile
 }
-{O(n)}
+{$\theta$(n)}
 
-\algoritmo{iasignar}{in/out a: acceso , in p : Nat, in s : $\alpha$}{}{
-  \State a[FhashPlaca(p,a)] = AgregarRapido(a[FhashPlaca(p,a)],s)
-  	\complejidad{O(1)}
+\algoritmo{iDameIterador}{in a:diccR}{res:itDiccR}{
+	\State $res \larr CrearIt(a.contenedor)$ \complejidad{O(1)}
 }
-{O(1)}
 
-
-\algoritmo{idameS}{in/out a: acceso , in p : Nat}{res : contenido}{
-  \State res = a[FhashPlaca(p,a)]
-  	\complejidad{O(1)}
-}
-{O(1)}
-
+\algoritmo{iObtener}{in/out a: diccR , in c : Nat}{res : \beta}{
+  	\State $res \larr a.accesoRapido[a.fHash(c)].obtener(c).siguiente()$ \complejidad{$\theta(1)$}
+}{$\theta(1)$}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{Servicios Usados}
-Del modulo ConjLineal 
+\subsection{Operaciones privadas}
+\algoritmo{fHash}{in a:diccR, in c:nat}{res:Nat}{
+	\State $res \larr (c \% a.tamanio())$ \complejidad{O(1)}
+}
+
+\subsection{Representación del iterador}
+
+\serc{itDiccRIt}{itDicc(<clave:nat, significado:\beta>)}
