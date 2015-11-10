@@ -233,47 +233,59 @@ $columnas(cE)=c.ancho \land filas(cE)=c.alto\land (\forall p:pos, PosValida?(cE,
 {O(1)}
 \algoritmo{iaPosMasCercana}{in c:campus, in p:pos, con:conj(pos)}{res:pos}{
 	\State $it \larr CrearIt(con)$
-	\State $res \larr it$
+	\State $res \larr it.siguiente()$
 	\While{HaySiguiente?(it))}
-		\State Avanzar(it)
-		\If{$Distancia(c,p)>Distancia(c,it)$}
-			\State $EliminarAnterior(it)$
-			\State $res \larr it$
-		\Endif
-		\If{$Distancia(c,p)<Distancia(c,it)$}
-			\State $Retroceder(it)$
-			\State $EliminarSiguiente(it)$
+		\If{$Distancia(c,p,res)>Distancia(c,it.siguiente(),res)$}
+			\State $res \larr it.siguiente()$
+			\While{HayAnterior()}
+				\State $EliminarAnterior(it)$
+			\Endwhile
+			\State Avanzar(it)
+		\Else
+			\If{$Distancia(c,p,res)<Distancia(c,it.siguiente(),res)$}
+				\State $EliminarSiguiente(it)$
+			\Else
+				\State Avanzar(it)
+			\Endif
 		\Endif
 	\Endwhile
 	\State $it \larr CrearIt(con)$
-	\State $res \larr it$
+	\State $res \larr it.siguiente()$
 	\While{HaySiguiente?(it))}
-		\State Avanzar(it)
-		\If{$Distancia(c,<0,0>)>Distancia(c,it)$}
-			\State $EliminarAnterior(it)$
-			\State $res \larr it$
+		\If{$Distancia(c,<0,0>,p)>Distancia(c,it.siguiente(),<0,0>)$}
+			\State $res \larr it.siguiente()$
+			\While{HayAnterior()}
+				\State $EliminarAnterior(it)$
+			\Endwhile
+			\State Avanzar(it)
+		\Else
+			\If{$Distancia(c,p,<0,0>)<Distancia(c,it.siguiente(),<0,0>)$}
+				\State $EliminarSiguiente(it)$
+			\Else
+				\State Avanzar(it)
+			\Endif
 		\Endif
-		\If{$Distancia(c,<0,0>)<Distancia(c,it)$}
-			\State $Retroceder(it)$
-			\State $EliminarSiguiente(it)$
-		\Endif
-	\Endwhile
+	\Endwhile	
 	\State $it \larr CrearIt(con)$
-	\State $res \larr it$
+	\State $res \larr it.siguiente()$
 	\While{HaySiguiente?(it))}
-		\State Avanzar(it)
-		\If{$p.Y<it.Y$}
-			\State $EliminarAnterior(it)$
-			\State $res \larr it$
-		\Endif
-		\If{$p.Y>it.Y$}
-			\State $Retroceder(it)$
-			\State $EliminarSiguiente(it)$
+		\If{$p.Y<it.siguiente().Y$}
+			\State $res \larr it.siguiente()$
+			\While{HayAnterior()}
+				\State $EliminarAnterior(it)$
+			\Endwhile
+			\State Avanzar(it)
+		\Else
+			\If{$p.Y>it.siguiente().Y$}
+				\State $EliminarSiguiente(it)$
+			\Else
+				\State Avanzar(it)
+			\Endif
 		\Endif
 	\Endwhile
 	
 }
-{O(1)}
+{O($#con$)}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
