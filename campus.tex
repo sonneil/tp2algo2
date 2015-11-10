@@ -74,18 +74,24 @@ $\textbf{usa}$
  {O(1)}
  {}
 
- \operacion{Distancia}{in c: campus, p1: pos, p2: pos}{res : nat}
+ \operacion{Distancia}{in c: campus, in p1: pos, in p2: pos}{res : nat}
  {$PosValida(c,p1) \land PosValida(c,p2)$}
  {$\var{res} \equiv distancia (p1, p2, c) $}
  {Comprueba si una posición es un ingreso inferior al campus.}
  {O(1)}
  {}
  
- \operacion{Vecinos}{in c: campus, p: pos}{res : conj(pos)}
+ \operacion{Vecinos}{in c: campus, in p: pos}{res : conj(pos)}
  {$PosValida(c,p)$}
  {$\var{res} \equiv vecinos (p, c) $}
- {devuekve el conjunto de vecinos de una posición.}
+ {Devuelve el conjunto de vecinos de una posición.}
  {O(1)}
+ {}
+  \operacion{aPosMasCercana}{in c: campus, in p: pos, in con:conj(pos)}{res : pos}
+ {$PosValida(c,p)\land \#con>0$}
+ {$(\forall p_1) PosValida(c, p_1) \impluego Distancia(c,p) \leq Distancia(c, p_1) $}
+ {Dado un conjunto de posiciones y una posiciones, da la más cercana a la posicion dada.}
+ {O($\#con$)}
  {}
  
 Las complejidades están en función de las siguientes variables:\\
@@ -101,58 +107,19 @@ $k$ : la cola de paquetes más larga de todas las computadoras.
 
 \serc{estr}{
 	\\
-	\donde{estr}{\tupla{ ancho: nat, alto: nat, 
-	   grilla: \mbox {arreglo(arreglo(\tupla{Ocupado: bool, EsObst: bool, EsAgente: bool}, \tupla{pl:nat, nombre:string}))}}
+	\donde{estr}{\tupla{ ancho: nat, alto: nat,	grilla: \mbox {arreglo(arreglo(\tupla{Ocupado: bool, EsObst: bool, EsAgente: bool, HiippieoEst:\tupla{pl:nat, nombre:string} }))}}
   }	
 }
 
 \subsubsection*{Invariante de representación}
 
 \begin{enumerate}
-  \item Todos los IP de \textit{compus} pertenecen al conjunto de claves de \textit{CompusPorPref} y la longitud de dicho arreglo 
-		es igual al cardinal de las claves del diccionario. 
-  \item Los pN de las tuplas que tiene el arreglo \textit{compus} apuntan al conjunto de paquetes(PorNom) 
-		de un significado en \textit{CompusPorPref} cuya clave es igual al IP de esa posición en el arreglo.
-  \item Los pN' apuntan al conjuno de paquetes(porNom') de un significado en \textit{CompusPorPref} cuya clave es igual al IP 
-		de esa posición en el arreglo
-  \item Los paquetes del significado pN' son iguales a los paquetes de pN
-  \item El origen de pN' es distinto al destino de pN' y ambos son posiciones válidas del arreglo compus
-  \item PosActual de pN' es una posicion válida del arreglo compus
-  \item La $\#PaquetesEnviados$ de cada compu es mayor o igual a la actual cantidad total de paquetes que pasaron por esa compu
-  \item Todos los conjuntos de los significados de \textit{CompusPorPref} son disjuntos dos a dos.
-  \item Los conjuntos de los campos de la tupla PorNom, PorPrior son iguales.
-  \item La matriz de caminosMinimos es cuadrada de lado n, con n igual al tamaño del arreglo de compus.
-  \item Para cualquier compu en el sistema f,d caminosMinimos[f][d] se corresponde con caminoMinimo(red,f,d)
-  \item La longitud de \textit{CaminosMinimos} es igual a la longitud del arreglo que tiene \textit{CaminosMinimos} en cada posición.
-  \item La longitud del arreglo, que tiene un arreglo de \textit{CaminosMinimos} es menor o igual a la longitud de \textit{CaminosMinimos}.
-  \item Los elementos del arreglo anteriormente mencionado son IPs del diccionario \textit{CompusPorPref} y no tiene repetidos.
-  \item La computadora que más paquetes envió es aquella cuyo índice es igual a \textit{LaQMasEnvio}
-\end{enumerate}
+  \item  El tamaño de todos los arreglos internos de la grilla es el mismo e igual al alto del campus
+  \item El tamaño del arreglo principal de la grilla es igual al ancho del campus
+\end{enumerate}  
 
-\rep{sistema}{s}  \\
- $1.\ \paratodo{String}{s}\ \fun{$def?$}(s, s.CompusPorPref), (\exists c : compu), \fun{$esta?$}(c,s.Compus)\ \land\ \pi_1(c) = s\ \land\ \fun{longitud}(s.Compus) = \#\Fun{claves}(s.CompusPorPref)$\\
- $2.\ \paratodo{compu}{c}\ \fun{esta?}(c, s.Compus), *\pi_2(c) = \fun{obtener}(\pi_1(c),s.CompusPorPref) $\\
- $3.\ \paratodo{compu}{c}\ \fun{esta?}(c, s.Compus), *\pi_3(c) = \fun{obtener}(\pi_3(c),s.CompusPorPref) $\\
- $4,5,6.$ \\$\ (\paratodo{nat}{c})\ 0 \le c < Longitud(s.compus) \impluego$\\
-  \indent $\ \ Longitud(s.compus[c].pN) = Longitud(s.compus[c].pN')$ $\land$ \\
-  \indent $\ \ (\paratodo{paquetePos}{p}) \fun{esta?}(p,s.compus[c].pN') \impluego$\\
-  \indent \indent \indent $\ \ \ \ \fun{esta}(\pi_1(p), s.compus[c].pN)$ $\land$ $0 \le indiceOrigen(p) < Longitud(s.compus)$\\
-  \indent \indent \indent $\ \ \ \ \land$ $0 \le indiceDestino(p) < Longitud(s.compus)$\\
-  \indent \indent \indent $\ \ \ \ \land$ $\ 0 \le posActual(p) < Longitud(s.compus)$\\
-  \indent \indent \indent $\ \ \ \ \land$ $\ \neg(indiceDestino(p)=indiceOrigen(p))$\\
- $7.\ \ (\paratodo{nat}{c})$ $0 \le c < Longitud(s.compus)$ $\impluego$\\
- \indent \indent $\ \ (\paratodo{paquetePos}{p})$ $\fun{pertenece}(s.compus[c].pN', p)$ $\impluego$\\
- \indent \indent \indent $\ \ \ \ \beta(\fun{esta}(s.compus[c],caminoMinimo(s.red,s.compus[indiceOrigen(p)],s.compus[posActual(p)])))$\\
- $8.\ \ \paratodo{String}{s,t}\ \fun{def?}(s, s.CompusPorPref)\ \land\ \fun{def?}(t, s.CompusPorPref)\ \land\ s \neq t \impluego \\ \fun{obtener}(s, s.CompusPorPref)\ \bigcap\ \fun{obtener}(t, s.CompusPorPref) = \emptyset$\\
- $9.\ \paratodo{String}{s}\ \fun{def?}(s, s.CompusPorPref)\ \impluego\ \pi_1(\fun{obtener}(s, s.CompusPorPref)) =\\ \pi_2(\fun{obtener}(s, s.CompusPorPref))$ \\
- $10.\ Longitud(s.compus) = Longitud(CaminosMinimos(s))$ $\land$\\
- \indent \indent \indent \indent$\ \ \ (\paratodo{nat}{i})$ $0 \le i < Longitud(s.compus)$ $\impluego$\\
- \indent \indent \indent \indent$\ \ \ \ \ Longitud(s.CaminosMinimos[i]) = Longitud(s.compus)$\\
- $11.\ (\paratodo{nat}{f,d})$ $\neg(f=d) \land$ $0 \le f,d < Longitud(s.compus)$ $\impluego$\\
- \indent \indent $\ \ \ CaminosMinimos[f][d]$ $=$\\
- \indent \indent $\ \ \ caminoMinimo(s.red,ipACompu(s.red,\pi_1(s.compus[f])),ipACompu(s.red,\pi_1(s.compus[d])))$\\
- $12,13,14.\ (\paratodo{nat}{i,j}),\ 0 \leq i,j < \fun{longitud}(s.CaminosMinimos) \impluego \fun{longitud}(s.CaminosMinimos) = \fun{longitud}(s.CaminosMinimos[i])\ \land\ \fun{longitud}(s.CaminosMinimos[i][j]) < \fun{longitud}(s.CaminosMinimos)\ \land\ (\paratodo{nat}{e}), \fun{esta?}(e, s.CaminosMinimos[i][j]) \Rightarrow \fun{pertenece}(e,s.CompusPorPref)  $\\
- $15. \paratodo{compu}{c}\ \fun{esta?}(c, s.Compus)\ \impluego\ \pi_3(c) \leq \pi_3(s.Compus[s.LaQMasEnvio])$
+\rep{campus}{}  \\
+ $|c.grilla|=c.ancho \land (\forall n:nat, n \in \lbrack 0, c.ancho)) |c.grilla [n]|=c.alto$
 %\subsubsection*{Función de abstracción}
  %\abs{sistema}{sist}{dcnet}{s} \\
 %$(\fun{s.} = \NULL \land \fun{*r.der} = \NULL \ssi nil?(a)) \ \oluego$ \\
@@ -165,81 +132,161 @@ $k$ : la cola de paquetes más larga de todas las computadoras.
 
 \subsubsection*{Funci\'on de abstracción}
 
-\abs{dcnet}{DCNet}{s}{dc} \\
-$red(dc)=$*$(s.red) \land (\forall c:compu, c\in compus(dc))( enEspera(dc,c)=$*$(enEspera(s,c)) \land$ \\
-$  cantidadEnviados(dc,c)=cantidadEnviados(s,c)) \land $ \\ 
-$(\forall p:paquete,paqueteEnTransito?(dc,p)) caminoRecorrido(dc,p)=$*$(caminoRecorrido(s,p)) $
+\abs{campus}{Campus}{c}{cE} \\
+$columnas(cE)=c.ancho \land filas(cE)=c.alto\land (\forall p:pos, PosValida?(cE,p)) Ocupada?(cE,p)=Ocupada?(c,p)$
 
 \newpage
 
 \subsection{Algoritmos}
 
-\algoritmo{icrearSistema}{in r:red}{res:dcnet}{
+\algoritmo{iArmarCampus}{in ancho:nat, in alto:nat}{res:campus}{
 %inicializacion Caminos Minimos
-	\State $res.red \larr r$
-	\State $n \larr Longitud(\Fun{compus}(red))$ \complejidad{O(1)}
-	\State $i\larr 0$
-	\State $j\larr 0$
-		\complejidad{O(1)}
-	\State $res.Compus \larr \Fun{CrearArreglo}(n)$
-		\complejidad{O(n)}
-	\State $res.CaminosMinimos\larr \Fun{CrearArreglo}(n)$
-		\complejidad{O(n)}
-	\Var{p: arreglo$\_$dimensionable de puntero(conjLog(paquete))}	
-	\While{i$<$n} \complejidad{O($L*n^5$)}
-		\complejidad{O(n)}
-		\State $res.CaminosMinimos[i] \larr \Fun{CrearArreglo}(n)$ 
-			\complejidad{O(n)}
-		\State s:$ \ <nat,conjLog(paquete,<_{id}),conjLog(paquete,<_{p}), $\\$ conjLog(paquetePos,<_{id}),conjLog(paquetePos,<_{p}) >$
-		%HAY que ver bien donde definir la relacion!!
-		\State $\pi_1(s) \larr compu(r,i)$
-		\State $\pi_2(s) \larr \Fun{nuevo}()$
-		\State $\pi_3(s) \larr \Fun{nuevo}()$
-		\State $\pi_4(s) \larr \Fun{nuevo}()$
-		\State $\pi_5(s) \larr \Fun{nuevo}()$
-		\State \Fun{definir}(res.CompusPorPref,compu(r,i),s)
-			\complejidad{O(L)}
-		\State $p[i] \larr \pi_3(s)$
-		\State $p'[i] \larr \pi_5(s) $
-		\State $res.Compus[i] \larr $ $<compu(r,i),p[i],p'[i],0>$ 
+	\State $res.ancho \larr ancho$ \complejidad {O(1)}
+	\State $res.alto \larr alto$ \complejidad {O(1)}
+	\State $res.grilla \larr CrearArreglo(ancho)$ \complejidad{O(an)}
+	\State $i\larr 0$ \complejidad {O(1)}
 			\complejidad{O(1)}
-		\While{j$<$n} \complejidad{O($L*n^4$)}
-			\complejidad{O(n)}
-			\State $res.CaminosMinimos[i][j] \larr caminoMinimo(compu(r,i),compu(r,j),r)$
-				\complejidad{O($L*n^3$)}
-			\State $j++$
+	\While{$i<ancho$} \complejidad{O($al*an$)}
+		\complejidad{O(an)}
+		\State $res.grilla[i] \larr \Fun{CrearArreglo}(alto)$ 
+			\complejidad{O(al)}
+		\State $j \larr 0$ \complejidad {O(1)}
+		\While {$j<alto$} \complejidad {O (al)}
+			\State $res.grilla [i][j] \larr <False,False,False,<0,"">>$ \complejidad {O(1)}
 		\EndWhile
-		\State $i++$	
 	\EndWhile
-	\State $res.LaQMasEnvio \larr 0$
-		\complejidad{O(1)}
+	
 %holi
 }
-{O($L \times n^5$)}
+{O($an*al$)}
 
-\algoritmo{icrearPaquete}{in/out s:dcnet,in/out p: paquete}{}{ %hay que cambiar nombres segun heap y avl
-  \State $t_1:\ <nat,conjLog(paquete,<_{id}),conjLog(paquete,<_{p}), $\\$ conjLog(paquetePos,<_{id}),conjLog(paquetePos,<_{p}) >$
-  \State $t_1 \larr \Fun{Obtener}(origen(p),\ \var{s}.CompusPorPref)$
-        \complejidad{O($L$)}
-  \State $t_2:\ <nat,conjLog(paquete,<_{id}),conjLog(paquete,<_{p}), $\\$ conjLog(paquetePos,<_{id}),conjLog(paquetePos,<_{p}) >$
-  \State $t_2 \larr \Fun{Obtener}(destino(p),\ \var{s}.CompusPorPref)$
-  	\complejidad{O($L$)}
-  \State $p$'$:paquetePos$ 
-  \State $\Fun{indiceOrigen}(p$'$) \larr \pi_1(t_1)$
-  	\complejidad{O(1)}
-  \State $\Fun{indiceDestino}(p$'$) \larr \pi_1(t_2)$
-  	\complejidad{O(1)}
-  \State $\Fun{posActual}(p$'$) \larr 0$
-  \State \Fun{insertar}($\pi_2(t),p$) %agrega segun nombre
-        \complejidad{O($log(k)$)}
-  \State \Fun{insertar}($\pi_3(t),p$) %agrega segun prioridad
-        \complejidad{O($log(k)$)}
-  \State \Fun{insertar}($\pi_4(t),p$') %agrega segun nombre
-        \complejidad{O($log(k)$)}
-  \State \Fun{insertar}($\pi_5(t),p$') %agrega segun prioridad
-        \complejidad{O($log(k)$)}
+\algoritmo{iAgregarObs}{in/out c:campus,in p: pos}{}{ %hay que cambiar nombres segun heap y avl
+  \State $\pi_1(c.grilla[p.X][p.Y]) \larr True$
+  	\complejidad {O(1)}
+  \State $\pi_2(c.grilla[p.X][p.Y]) \larr True$ \complejidad {O(1)}
 }
-{O($L + log(k)$)}
+{O(1)}
+\algoritmo{iAlto}{in c:campus}{res:nat}{
+	\State $res \larr c.alto$ \complejidad {O(1)}
+}
+{O(1)}
+\algoritmo{iAncho}{in c:campus}{res:nat}{
+	\State $res \larr c.ancho$ \complejidad {O(1)}
+}
+{O(1)}
+\algoritmo{iOcupada}{in c:campus, in p:pos}{res:bool}{
+	\State $res \larr c.grilla[p.X][p.Y].Ocupado$\complejidad {O(1)}
+}
+{O(1)}
+\algoritmo{iPosValida}{in c:campus, in p:pos}{res:bool}{
+	\State $res \larr p.X<c.ancho \land p.Y<c.alto$  \complejidad {O(1)}
+}
+{O(1)}
+\algoritmo{iEsIngreso}{in c:campus, in p:pos}{res:bool}{
+	\State $res \larr Y.p=0 \lor Y.p=c.alto-1 $\complejidad {O(1)}
+}
+{O(1)}
+\algoritmo{iIngresoSup}{in c:campus, in p:pos}{res:bool}{
+	\State $res \larr Y.p=0$\complejidad {O(1)}
+}
+{O(1)}
+\algoritmo{iIngresoInf}{in c:campus, in p:pos}{res:bool}{
+	\State $res \larr Y.p=c.alto-1$\complejidad {O(1)}
+}
+{O(1)}
+
+\algoritmo{iDistancia}{in c:campus, in p1:pos, in p2:pos}{res:nat}{
+	\State $resX \larr 0$
+	\State $resY \larr 0$
+	\If{$p1.X < p2.X$}
+		\State $resX \larr p2.X - p1.X$
+	\Else
+		\State $resX \larr p1.X-p2.X$
+	\EndIf
+	\If{$p1.Y<p2.Y$}
+		\State $resY \larr p2.Y-p1.Y$
+	\Else
+		\State $resy \larr p1.Y-p2.Y$
+	\EndIf
+	\State $res \larr resX+resY$
+}{O(1)}
+
+\algoritmo{iVecinos}{in c:campus, in p:pos}{res:conj(pos)}{
+	\State $res \larr Vacio() $
+	\State $pn \larr <p.X,p.Y+1>$
+	\If {$PosValida(c,pn)$}
+		\State agregar(res,pn)
+	\EndIf
+	\State $pn \larr <p.X,p.Y-1>$
+	\If {$PosValida(c,pn)$}
+		\State agregar(res,pn)
+	\EndIf
+	\State $pn \larr <p.X+1,p.Y>$
+	\If {$PosValida(c,pn)$}
+		\State agregar(res,pn)
+	\EndIf
+	\State $pn \larr <p.X-1,p.Y>$
+	\If {$PosValida(c,pn)$}
+		\State agregar(res,pn)
+	\EndIf
+	
+}
+{O(1)}
+
+\algoritmo{iaPosMasCercana}{in c:campus, in p:pos, in con:conj(pos)}{res:pos}{
+	\State $it \larr CrearIt(con)$
+	\State $res \larr it.siguiente()$
+	\While{HaySiguiente?(it))}
+		\If{$Distancia(c,p,res)>Distancia(c,it.siguiente(),res)$}
+			\State $res \larr it.siguiente()$
+			\While{HayAnterior()}
+				\State $EliminarAnterior(it)$
+			\EndWhile
+			\State Avanzar(it)
+		\Else
+			\If{$Distancia(c,p,res)<Distancia(c,it.siguiente(),res)$}
+				\State $EliminarSiguiente(it)$
+			\Else
+				\State Avanzar(it)
+			\EndIf
+		\EndIf
+	\EndWhile
+	\State $it \larr CrearIt(con)$
+	\State $res \larr it.siguiente()$
+	\While{HaySiguiente?(it))}
+		\If{$Distancia(c,<0,0>,p)>Distancia(c,it.siguiente(),<0,0>)$}
+			\State $res \larr it.siguiente()$
+			\While{HayAnterior()}
+				\State $EliminarAnterior(it)$
+			\EndWhile
+			\State Avanzar(it)
+		\Else
+			\If{$Distancia(c,p,<0,0>)<Distancia(c,it.siguiente(),<0,0>)$}
+				\State $EliminarSiguiente(it)$
+			\Else
+				\State Avanzar(it)
+			\EndIf
+		\EndIf
+	\EndWhile
+	\State $it \larr CrearIt(con)$
+	\State $res \larr it.siguiente()$
+	\While {$HaySiguiente?(it))$}
+		\If{$p.Y<it.siguiente().Y$}
+			\State $res \larr it.siguiente()$
+			\While{HayAnterior()}
+				\State $EliminarAnterior(it)$
+			\EndWhile
+			\State Avanzar(it)
+		\Else
+			\If{$p.Y>it.siguiente().Y$}
+				\State $EliminarSiguiente(it)$
+			\Else
+				\State Avanzar(it)
+			\EndIf
+		\EndIf
+	\EndWhile
+}
+{O($\#con$)}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

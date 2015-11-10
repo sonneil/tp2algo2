@@ -25,56 +25,56 @@ $\textbf{usa}$
 
 \operacion{campus}{in cs: campusSeguro }{res : campus}
  {true}
- {$\var{res} \igobs campus(cs)$}
+ {$res \igobs campus(cs)$}
  {Devuelve el campus del campusSeguro ingresado.}
  {O($1$)}
  {}
  
 \operacion{estudiantes}{in cs: campusSeguro }{res : conj(nombre)}
  {true}
- {$\var{res} \igobs estudiantes(cs)$}
+ {$res \igobs estudiantes(cs)$}
  {Devuelve un conjunto con los estudiantes del campusSeguro ingresado.}
  {O($1$)}
  {}
  
 \operacion{hippies}{in cs: campusSeguro }{res : conj(nombre)}
  {true}
- {$\var{res} \igobs hippies(cs)$}
+ {$res \igobs hippies(cs)$}
  {Devuelve un conjunto con los hippies del campusSeguro ingresado.}
  {O($1$)}
  {}
 
 \operacion{agentes}{in cs: campusSeguro }{res : conj(agentes)}
  {true}
- {$\var{res} \igobs agentes(cs)$}
+ {$res \igobs agentes(cs)$}
  {Devuelve un conjunto con los agentes del campusSeguro ingresado.}
- {O($1$)}
+ {O(1)}
  {}
  
 \operacion{PosicionEstudiantesYHippies}{in id: nombre, cs: campusSeguro }{res : posicion}
  {$id \in (estudiantes(cs) \cup hippies(cs))$}
- {$\var{res} \igobs posEstudianteYHippie(id, cs)$}
+ {$res \igobs posEstudianteYHippie(id, cs)$}
  {Devuelve la posicion del estudiante o hippie ingresado.}
  {O($|n_m|$)}
  {}
 
 \operacion{PosicionAgente}{in a: agente, cs: campusSeguro }{res : posicion}
  {$a \in agentes(cs)$}
- {$\var{res} \igobs posAgente(a, cs)$}
+ {$res \igobs posAgente(a, cs)$}
  {Devuelve la posicion del agente ingresado.}
  {O($1$)}
  {}
  
 \operacion{CantidadSanciones}{in a: agente, cs: campusSeguro }{res : nat}
  {$a \in agentes(cs)$}
- {$\var{res} \igobs cantSanciones(a, cs)$}
+ {$res \igobs cantSanciones(a, cs)$}
  {Devuelve la cantidad de sanciones del agente ingresado.}
  {O($1$)}
  {}
  
 \operacion{CantidadHippiesAtrapados}{in a: agente, cs: campusSeguro }{res : nat}
  {$a \in agentes(cs)$}
- {$\var{res} \igobs cantHippiesAtrapados(a, cs)$}
+ {$res \igobs cantHippiesAtrapados(a, cs)$}
  {Devuelve la cantidad de hippies atrapados por el agente ingresado.}
  {O($1$)}
  {}
@@ -83,14 +83,14 @@ $\textbf{usa}$
 
 \operacion{comenzarRastrillaje}{in c: campus, d: dicc(agente posicion) }{res : campusSeguro}
 {$(\paratodo{agente}{a})(def?(a, d) \impluego (posValida?(obtener(a, d)) \land \neg ocupada?(obtener(a, d), c))) \land $\\$ (\paratodo{agente}{a, a2}) ((def?(a, d) \land def?(a2, d) \land a \neq a2) \impluego obtener(a, d) \neq obtener(a2, d)$}
-{$\var{res} \igobs comenzarRastrillaje(c, d)$}
+{$res \igobs comenzarRastrillaje(c, d)$}
 {Crea un nuevo campusSeguro con campus y los agentes ingresados.}
 {O($1$)}
 {}
  
 \operacion{ingresarEstudiante}{in e: nombre, p: posicion, in/out cs: campusSeguro }{}
-{$\var(cs) \equiv \var(cs_0) \land e \notin (estudiantes(cs) \cup hippies(cs)) esIngreso?(p, campus(cs)) \land $\\$\neg estaOcupada?(p, cs))$}
-{$\var{res} \igobs ingresarEstudiante(e, p, cs_0)$}
+{$cs \igobs cs_0 \land e \notin (estudiantes(cs) \cup hippies(cs)) esIngreso?(p, campus(cs)) \land $\\$\neg estaOcupada?(p, cs))$}
+{$res \igobs ingresarEstudiante(e, p, cs_0)$}
 {Ingresa un nuevo estudiante al campus por una de las entradas.}
 {O($|n_m|$)}
 {}
@@ -171,7 +171,7 @@ $k$ : la cola de paquetes más larga de todas las computadoras.
   \\
   \donde{sistema}{\tupla{
       CampusEstatico: \mbox{Campus},
-      Campus : \mbox{arreglo(arreglo(\tupla{hayHippie: bool, hayEst: bool, hayAgente: bool, hayObst:bool, pl:itLista(agente), estudiante:itDPN(\tupla{nombre:string,pos:pos}), hippie:itDPN(\tupla{nombre:String,pos:pos})}))},
+      Campus : \mbox{arreglo(arreglo(\tupla{hayHippie: bool, hayEst: bool, hayAgente: bool, hayObst:bool, agente:itDiccR(agente), estudiante:itDPN(\tupla{nombre:string,pos:pos}), hippie:itDPN(\tupla{nombre:String,pos:pos})}))},
       estudiantes: \mbox{DiccPorNombre(nombre:string, pos:pos)},
       hippies: \mbox{DiccPorNombre(nombre:string, pos:pos)},
       agentesPorPlaca: \mbox{arreglo(placa:placa, pos:pos)},
@@ -282,6 +282,20 @@ $(\forall p:paquete,paqueteEnTransito?(dc,p)) caminoRecorrido(dc,p)=$*$(caminoRe
     \EndIf
  }{O(long(nombre))}
  
+ 
+  \algoritmo{ingresarHippie}{in/out as:as, in nombre:string, in pos:pos}{}{
+   
+    \State $as.agregarHippie(as, pos, nombre)$ \complejidad{O(long(nombre))}
+
+    \State $as.sancionarAgentesEncerrandoEstVecinos(as,pos)$ \complejidad{O(1)}
+    
+    \State $as.aplicarHippie(as, pos))$ \complejidad{O(long(nombre))}
+   
+    \State $as.aplicarHippiesVecinos(as,pos)$ \complejidad{O(long(nombre))}
+
+  
+ }{O(long(nombre))}
+ 
   \algoritmo{ComenzarRastrillaje}{in/out as:as, in ce:CampusEstatico, in Agentes:dicc(placa pos)}{}{
       \State $as.agentesPorPlaca \larr CrearVector(Agentes.tamanio())$
       \State $as.CampusEstatico \larr ce$ \complejidad{O(1)}
@@ -328,9 +342,7 @@ $(\forall p:paquete,paqueteEnTransito?(dc,p)) caminoRecorrido(dc,p)=$*$(caminoRe
         \State $ItAgentesRapido.siguiente.mismas \larr CrearIt(as.porSanciones)$ \complejidad{O(1)}
         \State $ItAgentesRapido.siguiente.miUbicacion \larr $\\$ as.porSanciones.obtenerUltimo.Agentes.Agregar(ItAgentesRapido.siguienteClave)$\complejidad{O(1)}
         \State $ItAgentesRapido.Avanzar$\complejidad{O(1)}
-      \EndWhile
-    
-
+      \EndWhile    
  }{O($(Ancho*Alto) + N_a$)}
 
  \algoritmo{moverEstudiante}{in/out as:as, in nombre:String, in dir:direccion}{}{
