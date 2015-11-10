@@ -192,18 +192,24 @@ $k$ : la cola de paquetes más larga de todas las computadoras.
 \subsubsection*{Invariante de representación}
 
 \begin{enumerate}
-  \item En cada posicion de campus hay como m\'aximo una entidad (agente, estudiante, hippie, obstaculo)
-  \item Si hayEst, hayHippie o hayAgente es true en alguna posici\'on, entonces el iterador correspondiente debe tener siguiente y apuntar a un lugar en el contenedor correspondiente
-  \item No puede haber dos iteradores que apunten a lo mismo
-  \item La cantidad de agentes, hippies y estudiantes en campus debe ser igual al tamaño de su correspondiente contenedor
-  \item MasVigilante es el it que apunta a los que mas hippiesCapturados tiene. En caso de empate, el que mayor nro de placa tiene
-  \item El conjunto de todos los agentes en porSanciones es igual a las claves del dicc de agentes
-  \item Si ocurrio sancion, el conjunto de agentes formado por la uni\'on de los conjuntos en cada posicion de conkSanciones es igual a las claves del dicc de agentes
-  \item porSanciones est\'a ordenado por \#sanciones y en caso de empate por nro de placa
-  \item Si ocurrio sancion, entonces, conKSanciones es 'una copia' (sin iteradores y pasando de lista de agentes a conj) de la lista de porSanciones
-  \item conKSanciones es\'a ordenado por \#sanciones y en caso de empate por nro de placa
-
-
+  \item El campus estatico tiene las mismas dimensiones que campus
+  \item Los obstaculos de campusEstatico estan en la misma pos que en Campus
+  \item Hay a lo sumo un bool en true en cada posicion de Campus
+  \item Todos los iteradores de las posiciones donde hayHippie apuntan a una pos valida del dicc de hippies
+  \item Todos los iteradores de las posiciones donde hayEst apuntan a una pos valida del dicc de estudiantes
+  \item Todos los iteradores de las posiciones donde hayAgente apuntan a una pos valida del dicc de agentes
+  \item Todos los significados de hippies apuntan a una posicion valida dentro de Campus, hay un hippie en esa pos,
+        \\el iterador apunta a la tupla (clave,significado) que estoy consultando
+  \item Todos los significados de estudiantes apuntan a una posicion valida dentro de Campus, hay un estudiante en esa pos,
+        \\el iterador apunta a la tupla (clave,significado) que estoy consultando
+  \item Todos las pos de los significados de agentes apuntan a una posicion valida dentro de Campus, hay un agente en esa pos,
+        \\el iterador apunta a la tupla (clave,significado) que estoy consultando
+  \item AgentesPorPlaca tiene el mismo tamaño que el dicc de agentes
+  \item El conjunto de tuplas (placa,pos), formado por  placas y pos de los significados del siguiente de agente en cada 
+        \\posicion de campus donde hayAgente y las posiciones de AgentesPorPlaca, son iguales
+  \item AgentesPorPlaca esta ordenado por numero de placa
+  \item Para todos mismas en los significados del dicc de agentes, la contatenacion de los anteriores , el actual y los siguientes son iguales a porSanciones
+  
 \end{enumerate}
 
 \rep{sistema}{s}  \\
