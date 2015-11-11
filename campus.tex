@@ -107,7 +107,7 @@ $an$ : cantidad de columnas del campus. \\
 
 \serc{estr}{
 	\\
-	\donde{estr}{\tupla{ ancho: nat, alto: nat,	grilla: \mbox {arreglo(arreglo(\tupla{Ocupado: bool, EsObst: bool, EsAgente: bool, HiippieoEst:\tupla{pl:nat, nombre:string} }))}}
+	\donde{estr}{\tupla{ ancho: nat, alto: nat,	grilla: \mbox {arreglo(arreglo(bool))}}
   }	
 }
 
@@ -152,7 +152,7 @@ $columnas(cE)=c.ancho \land filas(cE)=c.alto\land (\forall p:pos, PosValida?(cE,
 			\complejidad{O(al)}
 		\State $j \larr 0$ \complejidad {O(1)}
 		\While {$j<alto$} \complejidad {O (al)}
-			\State $res.grilla [i][j] \larr <False,False,False,<0,"">>$ \complejidad {O(1)}
+			\State $res.grilla [i][j] \larr false$ \complejidad {O(1)}
 		\EndWhile
 	\EndWhile
 	
@@ -161,9 +161,9 @@ $columnas(cE)=c.ancho \land filas(cE)=c.alto\land (\forall p:pos, PosValida?(cE,
 {O($an*al$)}
 
 \algoritmo{iAgregarObs}{in/out c:campus,in p: pos}{}{ %hay que cambiar nombres segun heap y avl
-  \State $\pi_1(c.grilla[p.X][p.Y]) \larr True$
+  \State $c.grilla[p.X][p.Y] \larr True$
   	\complejidad {O(1)}
-  \State $\pi_2(c.grilla[p.X][p.Y]) \larr True$ \complejidad {O(1)}
+  \State $c.grilla[p.X][p.Y] \larr True$ \complejidad {O(1)}
 }
 {O(1)}
 \algoritmo{iAlto}{in c:campus}{res:nat}{
@@ -175,7 +175,7 @@ $columnas(cE)=c.ancho \land filas(cE)=c.alto\land (\forall p:pos, PosValida?(cE,
 }
 {O(1)}
 \algoritmo{iOcupada}{in c:campus, in p:pos}{res:bool}{
-	\State $res \larr c.grilla[p.X][p.Y].Ocupado$\complejidad {O(1)}
+	\State $res \larr c.grilla[p.X][p.Y]$\complejidad {O(1)}
 }
 {O(1)}
 \algoritmo{iPosValida}{in c:campus, in p:pos}{res:bool}{
