@@ -144,7 +144,18 @@ $\textbf{usa}$
  {Devuelve al agente con más capturas realizadas del campus.}
  {O($1$)}
  {}
-
+ \operacion{HayAlgo}{in cs: campusSeguro, p:pos }{res : bool}
+ {$PosValida(cs.campus, p)$}
+ {$(cs.campus.[p.X][p.Y-1].hayHippie)\lor (cs.campus.[p.X][p.Y-1].hayEst)\lor (cs.campus.[p.X][p.Y-1].hayAgente)\lor(cs.campus.[p.X][p.Y-1].hayObst)$}
+ {Dice si la posición está ocupada.}
+ {O($1$)}
+ { }
+ \operacion{aIngresoMasCercano}{in cs: campusSeguro, in p: pos}{res : pos}
+ {$PosValida(c,p)$}
+ {$Pertenece(res, Vecinos(cs.campus))\land (\exists pi:pos)(\forall pn:pos)(EsIngreso(cs.campus,pi)\land EsIngreso(cs.campus,pn)) \impluego Distancia(c,p,pi)\leq Distancia(c,p,pn)\land Distancia(c,pi,res)\leq Distancia(c,p,pi)$}
+ {Devuelve la posición vecina válida más cercana a un ingreso}
+ {O(1)}
+ {}
 Las complejidades están en función de las siguientes variables:\\
 $c$ : es una instancia del campusSeguro, \\
 $p$ : es una posición, \\
@@ -635,6 +646,38 @@ $(\forall p:paquete,paqueteEnTransito?(dc,p)) caminoRecorrido(dc,p)=$*$(caminoRe
     \EndIf
     \State $res \larr proxPos$ \complejidad{O(1)}
  }{O($N_h$)}
+ \algoritmo{aIngresoMasCercano}{in p:pos, cs: campusSeguro}{res:pos}{
+	\If{$p.Y\leq c.alto/2$}
+		\If{$PosValida(cs.campus,<p.X,p.Y-1>)\land \lnot HayAlgo(cs,<p.X,p.Y-1>)$}
+			\State $res \larr <p.X,p.Y-1>$
+		\Else
+			\If{$PosValida/c,<p.X+1,p.Y>)\land \lnot HayAlgo(c,<p.X+1,p.Y>)$}
+				\State $res \larr <p.X+1,p.Y>$
+			\Else
+				\If{$PosValida/c,<p.X-1,p.Y>)\land \lnot HayAlgo(c,<p.X-1,p.Y>)$}
+					\State $res \larr <p.X-1,p.Y>$
+				\Else
+					\State $res \larr <p.X,p.Y+1>$
+				\EndIf
+			\EndIf
+		\EndIf
+	\Else
+		\If{$PosValida(cs.campus,<p.X,p.Y+1>)\land \lnot HayAlgo(cs,<p.X,p.Y+1>)$}
+			\State $res \larr <p.X,p.Y-1>$
+		\Else
+			\If{$PosValida/c,<p.X+1,p.Y>)\land \lnot HayAlgo(c,<p.X+1,p.Y>)$}
+				\State $res \larr <p.X+1,p.Y>$
+			\Else
+				\If{$PosValida/c,<p.X-1,p.Y>)\land \lnot HayAlgo(c,<p.X-1,p.Y>)$}
+					\State $res \larr <p.X-1,p.Y>$
+				\Else
+					\State $res \larr <p.X,p.Y-1>$
+				\EndIf
+			\EndIf
+		\EndIf
+	\EndIf
+}
+{O($1$)}
 
  \section{Pos es tupla(x:Nat, y:Nat)}
 
