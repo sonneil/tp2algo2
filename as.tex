@@ -1,4 +1,9 @@
 %\\\\\\\\\\\\!TEX root = tp2.tex
+\section{Pos es tupla(x:Nat, y:Nat)}
+
+\section{Placa es Nat}
+
+\section{Nombre es String}
 
 \section{CampusSeguro}
 
@@ -158,7 +163,7 @@ $N_h$ : es la cantidad actual de hippies. \\
       estudiantes: \mbox{DiccPorNombre(nombre:string, pos:pos)},
       hippies: \mbox{DiccPorNombre(nombre:string, pos:pos)},
       agentesPorPlaca: \mbox{arreglo(placa:placa, pos:pos)},
-      agentes: \mbox{DiccSuperRapido(pl:nat,\tupla{pos:pos,cantSanc:nat,cantCapturas:nat,mismas:itLista(conMismasBucket),miUbicacion:itLista(agente)})},
+      agentes: \mbox{DiccRapido(pl:nat,\tupla{pos:pos,cantSanc:nat,cantCapturas:nat,mismas:itLista(conMismasBucket),miUbicacion:itLista(agente)})},
       masVigilante: \mbox{agente:itDiccRapido},
       porSanciones: \mbox{Lista(conMismasBucket)},
       conKSanciones: \mbox{\tupla{ocurrioSancion:bool, arreglo:arreglo(conMismasBucket)}}
@@ -288,7 +293,8 @@ $(\paratodo{placa}{pl}) s.agentes.definido(pl) \impluego s.estudiantes.obtener(p
             \State $MayorPlaca \larr ItAgentes.siguienteClave()$\complejidad{O(1)}
             \State $MayorAgente \larr ItAgentes()$\complejidad{O(1)}
         \EndIf
-        \State $campus.agentesPorPlaca.insertarOrdenadoPorPlaca(<ItAgentes.siguienteClave(),ItAgentes.siguienteSignificado().pos>)$ \complejidad{O(1)}
+        \State $campus.agentesPorPlaca.insertarOrdenadoPorPlaca$
+        \State      $(<ItAgentes.siguienteClave(),ItAgentes.siguienteSignificado().pos>)$ \complejidad{O(1)}
         \State $ItAgentes.Avanzar$\complejidad{O(1)}
         \State $i++$\complejidad{O(1)}
       \EndWhile
@@ -478,7 +484,7 @@ $(\paratodo{placa}{pl}) s.agentes.definido(pl) \impluego s.estudiantes.obtener(p
     \State // El iterador mismas apunta a la posicion correspondiente del agente dentro de la lista ordenada por cantSanciones
     \State // Como la lista en el peor caso puede contener a todos los agentes con igual cant de sanciones
     \State // la mayor cantidad posible de iteraciones del ciclo es 4
-    \While {$agente.siguiente.mismcampus.haySiguiente() \land agente.siguiente.mismas.siguiente.cantSanciones < agente.siguiente.cantSanciones$}
+    \While {$agente.siguiente.mismcampus.haySiguiente()$ \\$\land$ $agente.siguiente.mismas.siguiente.cantSanciones < agente.siguiente.cantSanciones$}
       \State $agente.siguiente.mismas.avanzar()$ \complejidad{O(1)}
     \EndWhile
     \State // Si no hay siguiente o  si la cantidad de sanciones del siguiente es menor que la del agente, entonces, 
@@ -488,7 +494,8 @@ $(\paratodo{placa}{pl}) s.agentes.definido(pl) \impluego s.estudiantes.obtener(p
         \\$(agente.siguiente.mismas.haySiguiente \land$\\$agente.siguiente.cantSanciones=agente.siguiente.mismas.cantSanciones)$} \complejidad{O(1)}
       \State $nConMismasB \larr nuevaTupla(CrearNuevoDiccLineal(), agente.siguiente.cantSanciones)$
       \State $agente.siguiente.mismas \larr agente.siguiente.mismas.agregarComoSiguiente(nConMismasB)$ \complejidad{O(1)}
-      \State $agente.siguiente.miUbicacion \larr agente.siguiente.mismas.siguiente.agentes.agregarComoSiguiente(agente.siguiente.pl)$ \complejidad{O(1)}
+      \State $agente.siguiente.miUbicacion$ $\larr$
+      \State $agente.siguiente.mismas.siguiente.agentes.agregarComoSiguiente(agente.siguiente.pl)$ \complejidad{O(1)}
     \Else 
       \State $agente.siguiente.mismas.siguiente.agentes.agregarComoSiguiente(agente.siguiente.pl)$ \complejidad{O(1)}
     \EndIf
@@ -586,7 +593,8 @@ $(\paratodo{placa}{pl}) s.agentes.definido(pl) \impluego s.estudiantes.obtener(p
           \State $campus:campusSeguro.campus[pos.x][pos.y].hayHippie \larr False$ \complejidad{O(1)}
           \State $campus:campusSeguro.campus[pos.x][pos.y].hayEst \larr True$ \complejidad{O(1)}
           \State $as.campus[pos.x][pos.y].estudiante \larr CrearIt(campus.hippies)$ \complejidad{O(1)}
-          \State $campus.campus[pos.x][pos.y].estudiante.agregarComoSiguiente(campus.campus[pos.x][pos.y].estudiante.nombre)$ \complejidad{O(long(nombre))}
+          \State $campus.campus[pos.x][pos.y].estudiante.$
+          \State $agregarComoSiguiente(campus.campus[pos.x][pos.y].estudiante.nombre)$ \complejidad{O(long(nombre))}
           \State $campus.campus[pos.x][pos.y].hippie.eliminarSiguiente()$ \complejidad{O(long(nombre))}
       \Else
         \If {$campus.campus[pos.x][pos.y].hayHippie?$ $\land$ $atrapadoPorAgente(pos)$}
@@ -691,9 +699,3 @@ $(\paratodo{placa}{pl}) s.agentes.definido(pl) \impluego s.estudiantes.obtener(p
     	\State $res \larr <ar[min].otr, true>$
     \EndIf
  }{O(log($|ar|$)}
-
- \section{Pos es tupla(x:Nat, y:Nat)}
-
- \section{Placa es Nat}
-
- \section{Nombre es String}

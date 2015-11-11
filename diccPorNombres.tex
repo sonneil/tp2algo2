@@ -167,7 +167,7 @@ $((\paratodo{String}{s}) Definido?(d,s)) \impluego Definido?(e,s) \yluego (obten
 \subsection{Operaciones del iterador}
  \operacion{CrearIterador}{in d:dpn}{res:itDPN}
  {$true$}
- {$tuplasClaveSignificado(d) \igobs siguientes(res) \yluego aliasing(tuplasClaveSignificado(d),siguientes(res)) \land esVacia(anteriores(res))$}
+ {$tuplasClaveSignificado(d) \igobs siguientes(res)$ \\$\yluego aliasing(tuplasClaveSignificado(d),siguientes(res)) \land esVacia(anteriores(res))$}
  {Crea un iterador del diccionario por nombres}
  {$O(1)$}
  {Existe aliasing entre todas las tuplas <Clave, Significado> del dicc y siguientes del iterador}
@@ -230,14 +230,14 @@ $((\paratodo{String}{s}) Definido?(d,s)) \impluego Definido?(e,s) \yluego (obten
 
  \operacion{Avanzar}{in/out it:itDPN}{}
  {$HaySiguiente(it) \land it \igobs it_0$}
- {$anteriores(it_0) \bullet primero(siguientes(it_0)) \igobs anteriores(it) \land fin(siguientes(it_0)) \igobs siguientes(it)$}
+ {$anteriores(it_0) \bullet primero(siguientes(it_0)) \igobs$\\$anteriores(it) \land fin(siguientes(it_0)) \igobs siguientes(it)$}
  {Modifica el iterador, haciendolo avanzar una posicion}
  {$O(1)$}
  {}
 
 \operacion{Retroceder}{in/out it:itDPN}{}
  {$Hay anterior(it) \land it \igobs it_0$}
- {$comienzo(anteriores(it_0)) \igobs anteriores(it) \land ultimo(anteriores(it_0) \bullet siguientes(it_0) \igobs siguientes(it)$}
+ {$comienzo(anteriores(it_0)) \igobs anteriores(it)$\\$\land ultimo(anteriores(it_0) \bullet siguientes(it_0) \igobs siguientes(it)$}
  {Modifica el iterador, haciendolo retroceder una posicion}
  {$O(1)$}
  {}
