@@ -135,27 +135,8 @@ $\textbf{usa}$
  {$\var{res} \igobs masVigilante(cs)$}
  {Devuelve al agente con más capturas realizadas del campus.}
  {O($1$)}
-<<<<<<< HEAD
  {El mas vigilante se retorna por copia}
 
-=======
- {}
- 
- \operacion{HayAlgo}{in cs: campusSeguro, p:pos }{res : bool}
- {$PosValida(cs.campus, p)$}
- {$(cs.campus.[p.X][p.Y-1].hayHippie)\lor (cs.campus.[p.X][p.Y-1].hayEst)\lor \\ (cs.campus.[p.X][p.Y-1].hayAgente)\lor(cs.campus.[p.X][p.Y-1].hayObst)$}
- {Dice si la posición está ocupada.}
- {O($1$)}
- { }
- 
- \operacion{aIngresoMasCercano}{in cs: campusSeguro, in p: pos}{res : pos}
- {$PosValida(c,p)$}
- {$Pertenece(res, Vecinos(cs.campus))\land (\exists pi:pos)(\forall pn:pos) \\ (EsIngreso(cs.campus,pi)\land EsIngreso(cs.campus,pn)) \impluego \\ Distancia(c,p,pi)\leq Distancia(c,p,pn)\land Distancia(c,pi,res)\leq Distancia(c,p,pi)$}
- {Devuelve la posición vecina válida más cercana a un ingreso}
- {O(1)}
- {}
- 
->>>>>>> 51cd4eb86f04a81e209349d2b843e5e214d53e85
 Las complejidades están en función de las siguientes variables:\\
 $c$ : es una instancia del campusSeguro, \\
 $p$ : es una posición, \\
@@ -659,6 +640,8 @@ $(\paratodo{placa}{pl}) s.agentes.definido(pl) \impluego s.estudiantes.obtener(p
     \EndIf
     \State $res \larr proxPos$ \complejidad{O(1)}
  }{O($N_h$)}
+
+
  \algoritmo{aIngresoMasCercano}{in p:pos, cs: campusSeguro}{res:pos}{
 	\If{$p.Y\leq c.alto/2$}
 		\If{$PosValida(cs.campus,<p.X,p.Y-1>)\land \lnot HayAlgo(cs,<p.X,p.Y-1>)$}
@@ -691,6 +674,23 @@ $(\paratodo{placa}{pl}) s.agentes.definido(pl) \impluego s.estudiantes.obtener(p
 	\EndIf
 }
 {O($1$)}
+
+ \algoritmo{ibusquedaBinariaPorSanciones}{in ar:arreglo(val:nat otr: $\alpha$>), in sanc:nat}{res:$<\alpha , bool>$)}{
+ 	\State $res.\pi_2 \larr false$
+	\State $min \larr 0$
+	\State $max \larr |ar|$
+    \While {$max-min>1$} \complejidad{O(log($|ar|$))}
+       \State $med \larr (max-min)/2$
+       \If {$ar[med].val \leq sanc$}
+       		\State $min \larr med$
+       \Else
+       		\State $max \larr med$
+       	\EndIf
+    \EndWhile
+    \If {$ar[min].val = sanc$}
+    	\State $res \larr <ar[min].otr, true>$
+    \EndIf
+ }{O(log($|ar|$)}
 
  \section{Pos es tupla(x:Nat, y:Nat)}
 
