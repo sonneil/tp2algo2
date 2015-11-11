@@ -689,6 +689,23 @@ $(\forall p:paquete,paqueteEnTransito?(dc,p)) caminoRecorrido(dc,p)=$*$(caminoRe
 }
 {O($1$)}
 
+ \algoritmo{ibusquedaBinariaPorSanciones}}{in ar:arreglo(val:nat,otr: $\alpha$>), sanc:nat}{res:$<\alpha , bool>$)}{
+ 	\State $res.\pi_2 \larr false$
+	\State $min \larr 0$
+	\State $max \larr |ar|$
+    \While {$max-min>1$} \complejidad{O(log($|ar|$))}
+       \State $med \larr (max-min)/2$
+       \If {$ar[med].val \leq sanc$}
+       		\State $min \larr med$
+       \Else
+       		\State $max \larr med$
+       	\EndIf
+    \EndWhile
+    \If {$ar[min].val = sanc$}
+    	\State $res \larr <ar[min].otr, true>$
+    \EndIf
+ }{O(log($|ar|$)}
+
  \section{Pos es tupla(x:Nat, y:Nat)}
 
  \section{Placa es Nat}
