@@ -27,19 +27,19 @@ $\textbf{usa}$
   {}
   {$O(long(c))$}
 
- \operacion{Definir}{in/out d:dpn, in c:String, in e:\alpha}{}
+ \operacion{Definir}{in/out d:dpn, in c:String, in e:\alpha}{res:itDPN}
   {$d=d_0$}
   {$d \igobs Definir(d_0,e)$}
   {Se define e en el diccionario}
-  {No hay aliasing, se inserta por copia}
   {$O(long(c))$}
+  {El est se inserta por copia, pero retorna un iterador, hay aliasing}
 
  \operacion{Eliminar}{in/out d:dpn, in c:String}{}
  {$d \igobs d_0 \land definido?(d,c)$}
  {$d \igobs eliminar(d_0,c)$}
  {}
  {$O(long(c))$}
- {No hay aliasing}
+ {}
 
  \operacion{Significado}{in/out d:dpn, in c:String}{res:\alpha}
  {$def?(d,c)$}
@@ -48,13 +48,6 @@ $\textbf{usa}$
  {$O(long(c))$}
  {Hay aliasing entre el objeto devuelto y el almacenado}
 
- \operacion{ALista}{in/out d:dpn, in c:String}{res:\alpha}
- {$true$}
- {$ALista(res) \igobs tuplasClaveDiccionario(d)$}
- {Retorna tuplas <clave,significado> del diccionario}
- {$O(1)$}
- {Retorna por referencia, hay aliasing}
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Representación}
@@ -62,7 +55,7 @@ $\textbf{usa}$
 \serc{estr}{
 	\\
 	\donde{estr}{\tupla{ buckets: Vector(puntero(nodo)), enLista: Lista(<clave:String, significado:\alpha>) }}
-  \donde{Nodo}{\tupla{ hayS: bool, s:\alpha, enLista: itLista(<clave:String,significado:\alpha>), hijos: estr}}
+  \donde{Nodo}{\tupla{ hayS: bool, s:\alpha, enLista: itDPN(<clave:String,significado:\alpha>), hijos: estr}}
 }
 
 \subsubsection*{Invariante de representación}
@@ -73,13 +66,12 @@ $\textbf{usa}$
 \item El conjunto de claves de estr es igual al conjunto formado por cada prefijo obtenido al ir desde la raiz hasta un nodo con hayS=true
 \end{enumerate}
 
+
+\subsubsection*{Función de abstracción}
 \abs{estr}{dicc}{e}{d}
 $(\paratodo{String}{s}) s \in e.claves \igobs def?(d,s)$ $\land$ \\
 $((\paratodo{String}{s}) Definido?(d,s)) \impluego Definido?(e,s) \yluego (obtener(d,s) \igobs Significado(e,s))$
-
-\subsubsection*{Auxiliares}
-
-
+  
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -89,7 +81,7 @@ $((\paratodo{String}{s}) Definido?(d,s)) \impluego Definido?(e,s) \yluego (obten
   \State $res \larr CrearTupla(InicializarVector(),NULL)$
 }{O(1)}
 
-\algoritmo{iDefinir}{in/out d:dpn, in clave:String, in e:\alpha}{res:dpn}{
+\algoritmo{iDefinir}{in/out d:dpn, in clave:String, in e:\alpha}{res:itDPN}{
   \State $nodoClave:puntero(nodoClave) \larr nuevoNodoClave(clave, d.claves, NULL)$ \complejidad{O(long(clave))}
   \State $nodo:puntero(Nodo) \larr NULL$
   \State $i:nat \larr 0$
@@ -114,9 +106,10 @@ $((\paratodo{String}{s}) Definido?(d,s)) \impluego Definido?(e,s) \yluego (obten
   \State $nodo.significado \larr e$ \complejidad {O(1)}
   \State // Almaceno el iterador de lista al agregar atras la clave a la lista de claves del trie, por interfaz de listaEnlazada
   \State $nodo.enLista \larr d.claves.agAtras(<clave,e>)$ \complejidad {O(long(clave))}
+  \State $res \larr nodo.enLista$ \complejidad {O(long(clave))}
 }{O(long(clave))}
 
-\algoritmo{iEliminar}{in/out d:dpn, in clave:String}{res:dpn}{
+\algoritmo{iEliminar}{in/out d:dpn, in clave:String}{}{
   \State $nodo:puntero(Nodo) \larr NULL$
   \State $i:nat \larr 0$
   \State // Por ref
@@ -166,6 +159,10 @@ $((\paratodo{String}{s}) Definido?(d,s)) \impluego Definido?(e,s) \yluego (obten
   \EndWhile
   \State $res \larr nodo.hayS$ \complejidad{O(1)}
 }{O(long(clave))}
+
+\algoritmo{iALista}{in/out d:dpn, in clave:String}{res:Lista<clave significado>}{
+  \State $res$ $\larr$ $d.enLista$ \complejidad{O(1)}
+}
 
 \subsection{Operaciones del iterador}
  \operacion{CrearIterador}{in d:dpn}{res:itDPN}
