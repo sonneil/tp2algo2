@@ -189,7 +189,7 @@ $k$ : la cola de paquetes más larga de todas las computadoras.
       agentes: \mbox{DiccSuperRapido(pl:nat,\tupla{pos:pos,cantSanc:nat,cantCapturas:nat,mismas:itLista(conMismasBucket),miUbicacion:itLista(agente)})},
       masVigilante: \mbox{agente:itDiccRapido},
       porSanciones: \mbox{Lista(conMismasBucket)},
-      conKSanciones: \mbox{\tupla{ocurrioSancion:bool, arreglo:arreglo(\tupla{porKSanc:conj(agente),\#Sanciones:nat})}}
+      conKSanciones: \mbox{\tupla{ocurrioSancion:bool, arreglo:arreglo(conMismasBucket)}}
     }
   }
   \donde{conMismasBucket}{
@@ -219,7 +219,14 @@ $k$ : la cola de paquetes más larga de todas las computadoras.
   \item El conjunto de tuplas (placa,pos), formado por  placas y pos de los significados del siguiente de agente en cada 
         \\posicion de campus donde hayAgente y las posiciones de AgentesPorPlaca, son iguales
   \item AgentesPorPlaca esta ordenado por numero de placa
-  \item Para todos mismas en los significados del dicc de agentes, la contatenacion de los anteriores , el actual y los siguientes son iguales a porSanciones
+  \item Para todos los it mismas en los significados del dicc de agentes, la contatenacion de los anteriores , el actual y los siguientes son iguales a porSanciones
+  \item Para todos los it mismas en los significados del dicc de agentes, la cantSanciones en el significado es igual a la cantSanciones en el siguiente del iterador
+  \item Los anteriores unidos con los siguientes del iterador MiUbicacion en cada bucket del DiccRapido de agentes es igual al conjunto de agentes al que apunta mismas
+  \item La union de todos los agentes en porSanciones es igual al conjunto de claves en el dicc de agentes
+  \item No hay interseccion entre los conjuntos de agentes en porSanciones
+  \item Si conKSanciones.ocurrioSancion, entonces, conKSanciones es una copia de la lista de porSanciones.
+  \item El mas vigilante apunta a un agente en el dicc de agentes
+  \item El mas vigilante es el agente que tiene mas cantCapturas y en caso de empate mayor nro de placa
   
 \end{enumerate}
 
